@@ -13,5 +13,6 @@ public final class SDDataGenerators {
     // 26.2 split GatherDataEvent into Client/Server; the `data` run uses clientData() → the Client event.
     public static void gatherData(GatherDataEvent.Client event) {
         event.createProvider(SDRecipeProvider.Runner::new);
+        event.createProvider(SDItemModelProvider::new);
     }
 }
