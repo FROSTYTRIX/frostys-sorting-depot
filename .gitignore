@@ -15,3 +15,7 @@ runs/
 bin/
 # OS
 .DS_Store
+# Assistant / planning files — kept local, never tracked
+CLAUDE.md
+ROADMAP.md
+.claude/
