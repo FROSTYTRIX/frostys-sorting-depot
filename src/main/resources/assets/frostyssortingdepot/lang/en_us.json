@@ -1,7 +1,14 @@
 {
-  "itemGroup.frostyssortingdepot": "Example Mod Tab",
-  "block.frostyssortingdepot.example_block": "Example Block",
-  "item.frostyssortingdepot.example_item": "Example Item",
+  "itemGroup.frostyssortingdepot": "Frosty's Sorting Depot",
+
+  "item.frostyssortingdepot.filter_card": "Filter Card",
+  "item.frostyssortingdepot.filter_card.mode": "Mode: %s",
+  "item.frostyssortingdepot.filter_card.mode.item": "Item",
+  "item.frostyssortingdepot.filter_card.mode.tag": "Tag",
+  "item.frostyssortingdepot.filter_card.mode.overflow": "Overflow",
+  "item.frostyssortingdepot.filter_card.target": "Target: %s",
+  "item.frostyssortingdepot.filter_card.tags": "Tags: %s",
+  "item.frostyssortingdepot.filter_card.overflow": "Accepts anything",
 
   "frostyssortingdepot.configuration.title": "Frosty's Sorting Depot Configs",
   "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml": "Frosty's Sorting Depot Configs",
