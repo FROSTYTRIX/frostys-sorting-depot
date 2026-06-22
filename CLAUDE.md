@@ -6,8 +6,8 @@
 - **Mod ID:** `frostyssortingdepot`
 - **Package root:** `net.frostytrix.sortingdepot`
 - **Loader:** NeoForge (latest stable)
-- **Minecraft version:** 1.21.x (track latest NeoForge-supported release)
-- **Java version:** 21
+- **Minecraft version:** 26.2 (NeoForge `26.2.0.6-beta`)
+- **Java version:** 25 (Mojang ships Java 25 to end users in 26.2; the Gradle toolchain targets 25)
 
 ## What this mod does
 
