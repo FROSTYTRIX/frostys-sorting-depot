@@ -4,6 +4,8 @@ import java.util.function.Supplier;
 
 import net.frostytrix.sortingdepot.FrostysSortingDepot;
 import net.frostytrix.sortingdepot.item.FilterCardItem;
+import net.frostytrix.sortingdepot.item.LinkerItem;
+import net.frostytrix.sortingdepot.item.PriorityStampItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -25,12 +27,20 @@ public final class SDItems {
 
     public static final DeferredItem<FilterCardItem> FILTER_CARD =
             ITEMS.registerItem("filter_card", FilterCardItem::new);
+    public static final DeferredItem<PriorityStampItem> PRIORITY_STAMP =
+            ITEMS.registerItem("priority_stamp", PriorityStampItem::new);
+    public static final DeferredItem<LinkerItem> LINKER =
+            ITEMS.registerItem("linker", LinkerItem::new);
 
     /** Single creative tab holding everything the mod adds. */
     public static final Supplier<CreativeModeTab> MAIN_TAB = TABS.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.frostyssortingdepot"))
             .icon(() -> FILTER_CARD.get().getDefaultInstance())
-            .displayItems((parameters, output) -> output.accept(FILTER_CARD.get()))
+            .displayItems((parameters, output) -> {
+                output.accept(FILTER_CARD.get());
+                output.accept(PRIORITY_STAMP.get());
+                output.accept(LINKER.get());
+            })
             .build());
 
     public static void register(IEventBus modEventBus) {

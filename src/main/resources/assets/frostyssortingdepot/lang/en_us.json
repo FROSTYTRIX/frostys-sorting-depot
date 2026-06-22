@@ -10,6 +10,13 @@
   "item.frostyssortingdepot.filter_card.tags": "Tags: %s",
   "item.frostyssortingdepot.filter_card.overflow": "Accepts anything",
 
+  "item.frostyssortingdepot.priority_stamp": "Priority Stamp",
+  "item.frostyssortingdepot.priority_stamp.value": "Priority: %s",
+
+  "item.frostyssortingdepot.linker": "Linker",
+  "item.frostyssortingdepot.linker.unlinked": "Unlinked",
+  "item.frostyssortingdepot.linker.linked": "Linked to: [%s, %s, %s]",
+
   "frostyssortingdepot.configuration.title": "Frosty's Sorting Depot Configs",
   "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml": "Frosty's Sorting Depot Configs",
   "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml.title": "Frosty's Sorting Depot Configs",
