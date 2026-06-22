@@ -9,6 +9,7 @@ import net.frostytrix.sortingdepot.registry.SDBlockEntities;
 import net.frostytrix.sortingdepot.registry.SDBlocks;
 import net.frostytrix.sortingdepot.registry.SDDataComponents;
 import net.frostytrix.sortingdepot.registry.SDItems;
+import net.frostytrix.sortingdepot.registry.SDMenus;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -25,6 +26,7 @@ public class FrostysSortingDepot {
         SDBlocks.register(modEventBus);
         SDBlockEntities.register(modEventBus);
         SDItems.register(modEventBus);
+        SDMenus.register(modEventBus);
 
         // Data generation (runData).
         modEventBus.addListener(SDDataGenerators::gatherData);
