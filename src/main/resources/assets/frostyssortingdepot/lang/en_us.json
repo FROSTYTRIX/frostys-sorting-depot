@@ -1,0 +1,13 @@
+{
+  "itemGroup.frostyssortingdepot": "Example Mod Tab",
+  "block.frostyssortingdepot.example_block": "Example Block",
+  "item.frostyssortingdepot.example_item": "Example Item",
+
+  "frostyssortingdepot.configuration.title": "Frosty's Sorting Depot Configs",
+  "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml": "Frosty's Sorting Depot Configs",
+  "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml.title": "Frosty's Sorting Depot Configs",
+  "frostyssortingdepot.configuration.items": "Item List",
+  "frostyssortingdepot.configuration.logDirtBlock": "Log Dirt Block",
+  "frostyssortingdepot.configuration.magicNumberIntroduction": "Magic Number Text",
+  "frostyssortingdepot.configuration.magicNumber": "Magic Number"
+}

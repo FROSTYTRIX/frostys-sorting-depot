@@ -1,0 +1,17 @@
+# Gradle / build
+.gradle/
+build/
+out/
+# NeoForge / MDG run dirs
+run/
+runs/
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+bin/
+# OS
+.DS_Store
