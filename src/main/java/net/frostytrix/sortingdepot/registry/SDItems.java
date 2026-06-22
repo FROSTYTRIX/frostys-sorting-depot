@@ -8,6 +8,7 @@ import net.frostytrix.sortingdepot.item.LinkerItem;
 import net.frostytrix.sortingdepot.item.PriorityStampItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -32,6 +33,10 @@ public final class SDItems {
     public static final DeferredItem<LinkerItem> LINKER =
             ITEMS.registerItem("linker", LinkerItem::new);
 
+    // Block items. Registered here (not in SDBlocks) so all item-registry entries live in one place.
+    public static final DeferredItem<BlockItem> LINKER_NODE =
+            ITEMS.registerSimpleBlockItem("linker_node", SDBlocks.LINKER_NODE);
+
     /** Single creative tab holding everything the mod adds. */
     public static final Supplier<CreativeModeTab> MAIN_TAB = TABS.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.frostyssortingdepot"))
@@ -40,6 +45,7 @@ public final class SDItems {
                 output.accept(FILTER_CARD.get());
                 output.accept(PRIORITY_STAMP.get());
                 output.accept(LINKER.get());
+                output.accept(LINKER_NODE.get());
             })
             .build());
 

@@ -52,7 +52,22 @@ The model JSONs already point at these paths, so the items render as soon as the
 
 ---
 
-## Coming in Phase 3 (blocks — not needed yet)
+## Blocks (Phase 3)
 
-Depot Controller, Linker block, Overflow Chest, and (Phase 6) Depot Terminal will each need block
-textures + models. I'll add a block-art section here when we reach Phase 3.
+Block textures go in `src/main/resources/assets/frostyssortingdepot/textures/block/<name>.png` (16×16).
+
+### Linker Node — `linker_node.png`
+
+**Reads as:** a compact iron device you mount facing a chest, with a slot for a Filter Card.
+
+- Iron-housing cube, riveted/paneled like a small machine.
+- A visible **card slot** (thin dark rectangle) on the face, hinting the Filter Card goes in.
+- A **redstone-red status pip** + the **cyan accent** so it matches the item set.
+- Currently rendered as an all-faces cube (one texture). If you want a distinct front, supply
+  `_front` / `_side` / `_top` variants and I'll switch the model to a facing-aware one.
+
+### Coming later
+
+Depot Controller, Overflow Chest, and (Phase 6) Depot Terminal block textures — I'll add specs here as
+each block lands. The Linker GUI (Phase 3B) will also need a container background:
+`textures/gui/container/linker_node.png` (176×166 standard) — spec to follow when we build that screen.

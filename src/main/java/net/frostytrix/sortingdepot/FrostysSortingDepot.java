@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
 import net.frostytrix.sortingdepot.datagen.SDDataGenerators;
+import net.frostytrix.sortingdepot.registry.SDBlockEntities;
+import net.frostytrix.sortingdepot.registry.SDBlocks;
 import net.frostytrix.sortingdepot.registry.SDDataComponents;
 import net.frostytrix.sortingdepot.registry.SDItems;
 import net.neoforged.bus.api.IEventBus;
@@ -20,6 +22,8 @@ public class FrostysSortingDepot {
     public FrostysSortingDepot(IEventBus modEventBus, ModContainer modContainer) {
         // Data components must exist for items to reference them, so register them first.
         SDDataComponents.register(modEventBus);
+        SDBlocks.register(modEventBus);
+        SDBlockEntities.register(modEventBus);
         SDItems.register(modEventBus);
 
         // Data generation (runData).

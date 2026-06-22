@@ -1,6 +1,7 @@
 package net.frostytrix.sortingdepot.datagen;
 
 import net.frostytrix.sortingdepot.FrostysSortingDepot;
+import net.frostytrix.sortingdepot.registry.SDBlocks;
 import net.frostytrix.sortingdepot.registry.SDItems;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
@@ -23,8 +24,13 @@ public class SDItemModelProvider extends ModelProvider {
 
     @Override
     protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
+        // Items.
         itemModels.generateFlatItem(SDItems.FILTER_CARD.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(SDItems.PRIORITY_STAMP.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(SDItems.LINKER.get(), ModelTemplates.FLAT_ITEM);
+
+        // Blocks (also generates their block-item models). A simple all-faces cube for now; once the
+        // block has front/side/top art we can switch to createHorizontallyRotatedBlock for visible facing.
+        blockModels.createTrivialCube(SDBlocks.LINKER_NODE.get());
     }
 }

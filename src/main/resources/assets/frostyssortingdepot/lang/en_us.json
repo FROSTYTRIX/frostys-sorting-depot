@@ -17,6 +17,8 @@
   "item.frostyssortingdepot.linker.unlinked": "Unlinked",
   "item.frostyssortingdepot.linker.linked": "Linked to: [%s, %s, %s]",
 
+  "block.frostyssortingdepot.linker_node": "Linker Node",
+
   "frostyssortingdepot.configuration.title": "Frosty's Sorting Depot Configs",
   "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml": "Frosty's Sorting Depot Configs",
   "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml.title": "Frosty's Sorting Depot Configs",
