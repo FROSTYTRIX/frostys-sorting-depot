@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
@@ -92,19 +93,54 @@ public class DepotControllerBlockEntity extends BlockEntity {
 
     // --- ticking / routing ---------------------------------------------------------------------
 
+    /** Ticks between transfers — a hopper is 8, so this is roughly four times a hopper's throughput. */
+    private static final int TRANSFER_COOLDOWN = 2;
+
+    private int transferCooldown;
+
     public static void serverTick(Level level, BlockPos pos, BlockState state, DepotControllerBlockEntity be) {
-        // Idle controllers do nothing (no energy, no work when the buffer is empty).
-        if (ItemUtil.getStack(be.input, 0).isEmpty()) {
+        if (be.transferCooldown > 0) {
+            be.transferCooldown--;
             return;
         }
-        be.route(level);
+        // Hopper-style cadence: pull one item from above into the buffer, then route one item out.
+        be.transferCooldown = TRANSFER_COOLDOWN;
+        be.pullFromAbove(level);
+        be.route(level, 1);
     }
 
-    private void route(Level level) {
+    /** Pulls a single item from an inventory directly above into the input buffer (hopper-style). */
+    private void pullFromAbove(Level level) {
+        ResourceHandler<ItemResource> above =
+                level.getCapability(Capabilities.Item.BLOCK, worldPosition.above(), Direction.DOWN);
+        if (above == null) {
+            return;
+        }
+        for (int slot = 0; slot < above.size(); slot++) {
+            ItemResource resource = above.getResource(slot);
+            if (resource.isEmpty()) {
+                continue;
+            }
+            try (Transaction tx = Transaction.openRoot()) {
+                int extracted = above.extract(slot, resource, 1, tx);
+                if (extracted > 0 && input.insert(0, resource, extracted, tx) == extracted) {
+                    tx.commit();
+                    return;
+                }
+            }
+        }
+    }
+
+    /** Routes up to {@code maxMove} items from the buffer to their destinations. Returns true if any moved. */
+    private boolean route(Level level, int maxMove) {
         ItemStack remaining = ItemUtil.getStack(input, 0);
+        if (remaining.isEmpty()) {
+            return false;
+        }
+        int budget = maxMove;
         boolean changed = false;
 
-        while (!remaining.isEmpty()) {
+        while (!remaining.isEmpty() && budget > 0) {
             RoutableItem routable = toRoutableItem(remaining);
 
             // Build aligned candidate/target lists from the registered nodes.
@@ -125,22 +161,18 @@ public class DepotControllerBlockEntity extends BlockEntity {
             }
 
             int index = RoutingEngine.chooseTarget(routable, candidates);
-            ResourceHandler<ItemResource> target;
-            if (index >= 0) {
-                target = targets.get(index);
-            } else {
-                // No Linker matched (or all were full): fall back to an adjacent Overflow Chest.
-                target = findOverflow(level);
-                if (target == null) {
-                    break; // no overflow either — leave the rest in the buffer, never voided
-                }
+            ResourceHandler<ItemResource> target = index >= 0 ? targets.get(index) : findOverflow(level);
+            if (target == null) {
+                break; // nothing accepts it — leave it buffered, never voided
             }
 
-            int before = remaining.getCount();
-            remaining = insert(target, remaining);
-            if (remaining.getCount() == before) {
-                break; // safety: made no progress (everything full), avoid spinning
+            ItemStack toMove = remaining.copyWithCount(Math.min(budget, remaining.getCount()));
+            int moved = toMove.getCount() - insert(target, toMove).getCount();
+            if (moved == 0) {
+                break; // everything full — avoid spinning
             }
+            budget -= moved;
+            remaining = remaining.copyWithCount(remaining.getCount() - moved);
             changed = true;
         }
 
@@ -148,6 +180,7 @@ public class DepotControllerBlockEntity extends BlockEntity {
             input.set(0, ItemResource.of(remaining), remaining.getCount());
             setChanged();
         }
+        return changed;
     }
 
     /** The handler of an Overflow Chest adjacent to this Controller, or {@code null} if there is none. */

@@ -66,21 +66,39 @@ corner (that's where the hand holds it) and the **business end at the top-right*
 
 ## Block textures
 
-Block textures go in `src/main/resources/assets/frostyssortingdepot/textures/block/<name>.png`, **16×16 per
-face**. Each block is currently a single all-faces cube (one `<name>.png` used on every side). If you want a
-distinct front/side/top for any of them, supply `_front` / `_side` / `_top` variants and I'll switch that
-block's model to a multi-face (and, for the Linker Node, facing-aware) model. Keep the **iron palette** and
-the **cyan Frosty accent** consistent so the set reads as one machine family; use the **redstone-red** as a
-status/active color.
+Block textures go in `src/main/resources/assets/frostyssortingdepot/textures/block/`, **16×16 per face**.
+The models are now **multi-face** (filenames listed per block below). Keep the **iron palette** and the
+**cyan Frosty accent** consistent so the set reads as one machine family; use **redstone-red** as the
+status/active color. *(`_top`/`_side` files may safely duplicate art if you don't want them distinct.)*
 
-### Linker Node — `linker_node.png`
+### Linker Node — `linker_node_front.png`, `linker_node_side.png`, `linker_node_top.png`
 
-**Reads as:** a compact iron junction box you mount on/facing a chest; it holds one Filter Card.
-- Iron housing with a riveted/paneled border (corner rivets, a 1px bevel).
-- A **card slot**: a thin recessed dark rectangle across the face (where the Filter Card seats), with a tiny
-  sliver of paper-cream peeking out so it reads as "a card goes here."
-- A small **redstone-red status pip** in a corner + a **cyan accent** stripe along one edge.
-- *(If you do a `_front`, put the slot + pip there; sides/top can be plain riveted iron.)*
+**Facing-aware:** the `_front` faces the chest it serves. Reads as a compact iron junction box holding one
+Filter Card.
+- **`_front`:** iron housing with a riveted border; a thin recessed **card slot** (dark rectangle) with a
+  sliver of paper-cream, plus a **redstone-red status pip** and a **cyan** edge accent.
+- **`_side`:** plain riveted iron panel (used on the 4 non-front sides and the bottom).
+- **`_top`:** riveted iron lid; can mirror `_side` if you like.
+
+### Depot Controller — `depot_controller_top.png`, `depot_controller_side.png`, `depot_controller_bottom.png`
+
+The brain/hub — beefier than the others. Items feed in from **above**, so the **top** is the intake.
+- **`_top`:** a **hopper-like intake funnel/grate** (darker recess in the center) — clearly where items go in.
+- **`_side`:** heavy riveted iron with a **central redstone-red indicator lens** (slightly glowing) and a
+  faint comparator-notch vibe; **cyan** trim.
+- **`_bottom`:** plain iron plate (can copy `_side` or `_top`).
+
+### Depot Terminal — `depot_terminal_front.png`, `depot_terminal_side.png`, `depot_terminal_top.png`
+
+**Facing-aware:** the `_front` (screen) faces the player who placed it.
+- **`_front`:** iron frame around a dark **screen** (`#1a1f24`) with faint **cyan** scanlines / tiny list
+  glyphs and one **redstone-red** power pip.
+- **`_side` / `_top`:** plain iron casing (thin top edge); may share one texture.
+
+### Overflow Chest — *(becoming an entity-rendered chest)*
+
+Will use the **vanilla chest model + UV layout** once the chest refactor lands; its texture goes in
+`textures/entity/chest/` in chest-sheet layout, not as a block face. Spec to follow with that change.
 
 ### Depot Controller — `depot_controller.png`
 

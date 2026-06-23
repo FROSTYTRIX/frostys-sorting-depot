@@ -1,6 +1,8 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/orientable",
   "textures": {
-    "all": "frostyssortingdepot:block/linker_node"
+    "front": "frostyssortingdepot:block/linker_node_front",
+    "side": "frostyssortingdepot:block/linker_node_side",
+    "top": "frostyssortingdepot:block/linker_node_top"
   }
 }

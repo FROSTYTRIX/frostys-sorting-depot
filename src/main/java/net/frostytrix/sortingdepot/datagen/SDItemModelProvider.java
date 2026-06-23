@@ -7,6 +7,7 @@ import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.client.data.models.model.TexturedModel;
 import net.minecraft.data.PackOutput;
 
 /**
@@ -30,11 +31,13 @@ public class SDItemModelProvider extends ModelProvider {
         // The Linker is a handheld tool, so it renders in-hand like a sword/wand.
         itemModels.generateFlatItem(SDItems.LINKER.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
 
-        // Blocks (also generates their block-item models). Simple all-faces cubes for now; once the
-        // blocks have front/side/top art we can switch to createHorizontallyRotatedBlock for visible facing.
-        blockModels.createTrivialCube(SDBlocks.LINKER_NODE.get());
-        blockModels.createTrivialCube(SDBlocks.DEPOT_CONTROLLER.get());
+        // Blocks (also generates their block-item models).
+        // Linker Node + Depot Terminal face a direction → orientable model (front/side/top), rotated by facing.
+        blockModels.createHorizontallyRotatedBlock(SDBlocks.LINKER_NODE.get(), TexturedModel.ORIENTABLE_ONLY_TOP);
+        blockModels.createHorizontallyRotatedBlock(SDBlocks.DEPOT_TERMINAL.get(), TexturedModel.ORIENTABLE_ONLY_TOP);
+        // Depot Controller: distinct top (intake) + sides + bottom.
+        blockModels.createTrivialBlock(SDBlocks.DEPOT_CONTROLLER.get(), TexturedModel.CUBE_TOP_BOTTOM);
+        // Overflow Chest stays a plain cube here (it becomes an entity-rendered chest in a follow-up).
         blockModels.createTrivialCube(SDBlocks.OVERFLOW_CHEST.get());
-        blockModels.createTrivialCube(SDBlocks.DEPOT_TERMINAL.get());
     }
 }

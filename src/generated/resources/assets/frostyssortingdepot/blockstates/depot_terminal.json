@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=east": {
+      "model": "frostyssortingdepot:block/depot_terminal",
+      "y": 90
+    },
+    "facing=north": {
       "model": "frostyssortingdepot:block/depot_terminal"
+    },
+    "facing=south": {
+      "model": "frostyssortingdepot:block/depot_terminal",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "frostyssortingdepot:block/depot_terminal",
+      "y": 270
     }
   }
 }

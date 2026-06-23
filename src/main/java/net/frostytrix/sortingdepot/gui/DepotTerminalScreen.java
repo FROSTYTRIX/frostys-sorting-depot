@@ -71,13 +71,21 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
                         8, y, TEXT_COLOR, false);
                 y += ROW_HEIGHT;
             }
-            // Scroll affordances.
-            if (scrollOffset > 0) {
-                graphics.text(this.font, Component.literal("▲"), this.imageWidth - 16, LIST_TOP, TEXT_COLOR, false);
-            }
-            if (end < linkers.size()) {
-                graphics.text(this.font, Component.literal("▼ " + (linkers.size() - end) + " more"),
-                        8, y, TEXT_COLOR, false);
+            // Scroll affordances, both arrows together at the bottom of the list.
+            boolean hasAbove = scrollOffset > 0;
+            boolean hasBelow = end < linkers.size();
+            if (hasAbove || hasBelow) {
+                StringBuilder indicator = new StringBuilder();
+                if (hasAbove) {
+                    indicator.append("▲");
+                }
+                if (hasBelow) {
+                    if (hasAbove) {
+                        indicator.append(' ');
+                    }
+                    indicator.append("▼ ").append(linkers.size() - end).append(" more");
+                }
+                graphics.text(this.font, Component.literal(indicator.toString()), 8, y, TEXT_COLOR, false);
             }
         }
 
