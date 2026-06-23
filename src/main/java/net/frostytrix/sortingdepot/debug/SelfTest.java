@@ -1,6 +1,8 @@
 package net.frostytrix.sortingdepot.debug;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import net.frostytrix.sortingdepot.FrostysSortingDepot;
 import net.frostytrix.sortingdepot.block.LinkerNodeBlock;
@@ -91,6 +93,14 @@ public final class SelfTest {
         int inChest = countItem(level, chestPos, Items.COBBLESTONE);
         int afterMatch = ItemUtil.getStack(controller.getInputHandler(), 0).getCount();
 
+        // Scenario 1b: a TAG filter routes by tag. Rebind the card to #minecraft:logs and feed oak logs.
+        ItemStack tagCard = new ItemStack(SDItems.FILTER_CARD.get());
+        tagCard.set(SDDataComponents.FILTER_DATA.get(), new FilterCardData(
+                FilterCardData.Mode.TAG, Optional.empty(), Set.of(Identifier.parse("minecraft:logs")), false));
+        node.getFilterSlot().set(0, ItemResource.of(tagCard), 1);
+        feedAndRoute(level, controller, controllerPos, controllerState, Items.OAK_LOG);
+        int logsInChest = countItem(level, chestPos, Items.OAK_LOG);
+
         // Scenario 2: a non-matching item falls through to the Overflow Chest.
         feedAndRoute(level, controller, controllerPos, controllerState, Items.DIRT);
         int inOverflow = countItem(level, overflowPos, Items.DIRT);
@@ -107,17 +117,18 @@ public final class SelfTest {
         int strandedInInput = ItemUtil.getStack(controller.getInputHandler(), 0).getCount();
 
         boolean matchOk = inChest == TEST_COUNT && afterMatch == 0;
+        boolean tagOk = logsInChest == TEST_COUNT;
         boolean overflowOk = inOverflow == TEST_COUNT && afterOverflow == 0;
         boolean noVoidOk = strandedInInput == TEST_COUNT;
-        if (matchOk && overflowOk && noVoidOk) {
+        if (matchOk && tagOk && overflowOk && noVoidOk) {
             FrostysSortingDepot.LOGGER.info(
-                    "[SD-SELFTEST] PASS: match->chest ({}), unmatched->overflow ({}), "
-                            + "no-target items stay buffered ({}, never voided)",
-                    inChest, inOverflow, strandedInInput);
+                    "[SD-SELFTEST] PASS: item-filter->chest ({}), tag-filter->chest ({}), "
+                            + "unmatched->overflow ({}), no-target items stay buffered ({}, never voided)",
+                    inChest, logsInChest, inOverflow, strandedInInput);
         } else {
-            fail("match{chest=" + inChest + ",input=" + afterMatch + "} overflow{chest=" + inOverflow
-                    + ",input=" + afterOverflow + "} novoid{buffered=" + strandedInInput + "/" + TEST_COUNT + "}",
-                    all, level);
+            fail("item{chest=" + inChest + ",input=" + afterMatch + "} tag{logs=" + logsInChest + "/" + TEST_COUNT
+                    + "} overflow{chest=" + inOverflow + ",input=" + afterOverflow + "} "
+                    + "novoid{buffered=" + strandedInInput + "/" + TEST_COUNT + "}", all, level);
         }
 
         all.forEach(p -> level.setBlockAndUpdate(p, Blocks.AIR.defaultBlockState()));

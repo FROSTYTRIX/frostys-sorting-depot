@@ -7,7 +7,7 @@
   "item.frostyssortingdepot.filter_card.mode.tag": "Tag",
   "item.frostyssortingdepot.filter_card.mode.overflow": "Overflow",
   "item.frostyssortingdepot.filter_card.target": "Target: %s",
-  "item.frostyssortingdepot.filter_card.tags": "Tags: %s",
+  "item.frostyssortingdepot.filter_card.tags": "Tag: %s",
   "item.frostyssortingdepot.filter_card.overflow": "Accepts anything",
 
   "item.frostyssortingdepot.priority_stamp": "Priority Stamp",
