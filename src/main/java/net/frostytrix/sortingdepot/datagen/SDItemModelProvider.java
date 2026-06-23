@@ -9,6 +9,8 @@ import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TexturedModel;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.Blocks;
 
 /**
  * Generates item models (and the 1.21.4+ item-model definitions) for every item the mod adds.
@@ -37,7 +39,8 @@ public class SDItemModelProvider extends ModelProvider {
         blockModels.createHorizontallyRotatedBlock(SDBlocks.DEPOT_TERMINAL.get(), TexturedModel.ORIENTABLE_ONLY_TOP);
         // Depot Controller: distinct top (intake) + sides + bottom.
         blockModels.createTrivialBlock(SDBlocks.DEPOT_CONTROLLER.get(), TexturedModel.CUBE_TOP_BOTTOM);
-        // Overflow Chest stays a plain cube here (it becomes an entity-rendered chest in a follow-up).
-        blockModels.createTrivialCube(SDBlocks.OVERFLOW_CHEST.get());
+        // Overflow Chest is an entity-rendered chest: particle-only blockstate + a 3D chest item model.
+        blockModels.createChest(SDBlocks.OVERFLOW_CHEST.get(), Blocks.OAK_PLANKS,
+                Identifier.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, "entity/chest/overflow"), false);
     }
 }

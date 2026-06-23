@@ -95,10 +95,16 @@ The brain/hub — beefier than the others. Items feed in from **above**, so the 
   glyphs and one **redstone-red** power pip.
 - **`_side` / `_top`:** plain iron casing (thin top edge); may share one texture.
 
-### Overflow Chest — *(becoming an entity-rendered chest)*
+### Overflow Chest — `textures/entity/chest/overflow.png`
 
-Will use the **vanilla chest model + UV layout** once the chest refactor lands; its texture goes in
-`textures/entity/chest/` in chest-sheet layout, not as a block face. Spec to follow with that change.
+It's now a **real (entity-rendered) chest** — same model, lid animation, double-chest joining, and **UV
+layout** as a vanilla chest. So the texture is a **chest-sheet entity texture** (64×64, the standard single
+chest layout — lid, base, latch, in the same UV regions as `minecraft:textures/entity/chest/normal.png`),
+**not** a block face. Until this PNG exists the chest renders as the missing-texture placeholder.
+- Wooden chest body (wood palette) with **iron banding/latch**; an **overflow motif** (downward funnel /
+  chevrons) on the front, and a **cyan** tag so it reads as part of the family.
+- Registered into the chest atlas via `assets/minecraft/atlases/chest.json` and drawn by the
+  `OverflowChestRenderer` (custom-sprite hook).
 
 ### Depot Controller — `depot_controller.png`
 

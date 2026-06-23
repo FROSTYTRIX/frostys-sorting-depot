@@ -18,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemUtil;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -91,7 +92,7 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
     private static @Nullable ResourceHandler<ItemResource> adjacentOverflow(Level level, BlockPos controllerPos) {
         for (Direction direction : Direction.values()) {
             if (level.getBlockEntity(controllerPos.relative(direction)) instanceof OverflowChestBlockEntity overflow) {
-                return overflow.getHandler();
+                return VanillaContainerWrapper.of(overflow);
             }
         }
         return null;

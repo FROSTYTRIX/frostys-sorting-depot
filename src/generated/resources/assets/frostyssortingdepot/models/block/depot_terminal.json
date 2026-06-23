@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/orientable",
-  "textures": {
-    "front": "frostyssortingdepot:block/depot_terminal_front",
-    "side": "frostyssortingdepot:block/depot_terminal_side",
-    "top": "frostyssortingdepot:block/depot_terminal_top"
-  }
-}

@@ -6,7 +6,6 @@ import net.frostytrix.sortingdepot.FrostysSortingDepot;
 import net.frostytrix.sortingdepot.gui.DepotControllerMenu;
 import net.frostytrix.sortingdepot.gui.DepotTerminalMenu;
 import net.frostytrix.sortingdepot.gui.LinkerNodeMenu;
-import net.frostytrix.sortingdepot.gui.OverflowChestMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
 import net.neoforged.bus.api.IEventBus;
@@ -26,9 +25,6 @@ public final class SDMenus {
 
     public static final Supplier<MenuType<LinkerNodeMenu>> LINKER_NODE =
             MENUS.register("linker_node", () -> IMenuTypeExtension.create(LinkerNodeMenu::new));
-
-    public static final Supplier<MenuType<OverflowChestMenu>> OVERFLOW_CHEST =
-            MENUS.register("overflow_chest", () -> IMenuTypeExtension.create(OverflowChestMenu::new));
 
     public static final Supplier<MenuType<DepotControllerMenu>> DEPOT_CONTROLLER =
             MENUS.register("depot_controller", () -> IMenuTypeExtension.create(DepotControllerMenu::new));

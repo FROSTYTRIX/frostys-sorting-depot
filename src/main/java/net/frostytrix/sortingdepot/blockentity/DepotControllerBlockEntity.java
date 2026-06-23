@@ -25,6 +25,7 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemUtil;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 
@@ -183,11 +184,11 @@ public class DepotControllerBlockEntity extends BlockEntity {
         return changed;
     }
 
-    /** The handler of an Overflow Chest adjacent to this Controller, or {@code null} if there is none. */
+    /** The inventory of an Overflow Chest adjacent to this Controller, or {@code null} if there is none. */
     private @Nullable ResourceHandler<ItemResource> findOverflow(Level level) {
         for (Direction direction : Direction.values()) {
             if (level.getBlockEntity(worldPosition.relative(direction)) instanceof OverflowChestBlockEntity overflow) {
-                return overflow.getHandler();
+                return VanillaContainerWrapper.of(overflow);
             }
         }
         return null;
