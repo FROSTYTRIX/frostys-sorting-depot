@@ -37,5 +37,10 @@ public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
         Component priority = Component.translatable(
                 "item.frostyssortingdepot.priority_stamp.value", this.menu.getNode().getPriority());
         graphics.text(this.font, priority, 8, 20, 0xFF404040, false);
+
+        Component status = Component.translatable(this.menu.isLinked()
+                ? "gui.frostyssortingdepot.linker_node.linked"
+                : "gui.frostyssortingdepot.linker_node.unlinked");
+        graphics.text(this.font, status, 8, 31, this.menu.isLinked() ? 0xFF3A7A3A : 0xFF7A3A3A, false);
     }
 }

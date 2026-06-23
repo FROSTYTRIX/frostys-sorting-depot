@@ -34,5 +34,6 @@ public class SDItemModelProvider extends ModelProvider {
         blockModels.createTrivialCube(SDBlocks.LINKER_NODE.get());
         blockModels.createTrivialCube(SDBlocks.DEPOT_CONTROLLER.get());
         blockModels.createTrivialCube(SDBlocks.OVERFLOW_CHEST.get());
+        blockModels.createTrivialCube(SDBlocks.DEPOT_TERMINAL.get());
     }
 }

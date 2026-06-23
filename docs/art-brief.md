@@ -72,8 +72,10 @@ Depot Controller and Overflow Chest block textures (cube faces), plus (Phase 6) 
 
 **GUI container backgrounds** (`textures/gui/container/<name>.png`, 256×256 canvas, content in the top-left
 176×166):
-- `linker_node.png` — single Filter Card slot centered (~80,35).
+- `linker_node.png` — single Filter Card slot centered (~80,35); leaves room for "Priority" / status text top-left.
 - `depot_controller.png` — single input-buffer slot near the top (~80,20); label space for "Buffer".
+- `depot_terminal.png` — **200×180** dashboard panel (no slots); space for ~8 text rows under the title plus
+  two footer lines. The list/footer text is drawn over it.
 - The **Overflow Chest GUI needs no texture** — it reuses vanilla `generic_54.png`.
 
 Both custom GUIs render with the missing-texture placeholder until these exist, but are fully functional.

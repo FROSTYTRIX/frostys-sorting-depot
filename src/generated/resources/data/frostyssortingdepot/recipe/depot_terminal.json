@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "D": "frostyssortingdepot:depot_controller",
+    "G": "minecraft:glass_pane",
+    "R": "minecraft:redstone"
+  },
+  "pattern": [
+    "R",
+    "G",
+    "D"
+  ],
+  "result": {
+    "id": "frostyssortingdepot:depot_terminal"
+  }
+}

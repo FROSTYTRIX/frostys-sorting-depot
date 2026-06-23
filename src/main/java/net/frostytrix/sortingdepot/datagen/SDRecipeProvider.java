@@ -86,6 +86,17 @@ public class SDRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_comparator", has(Items.COMPARATOR))
                 .save(output, key("depot_controller"));
 
+        // Depot Terminal — Controller + Glass Pane + Redstone (optional QoL).
+        shaped(RecipeCategory.MISC, new ItemStackTemplate(SDItems.DEPOT_TERMINAL.get()))
+                .pattern("R")
+                .pattern("G")
+                .pattern("D")
+                .define('R', Items.REDSTONE)
+                .define('G', Items.GLASS_PANE)
+                .define('D', SDItems.DEPOT_CONTROLLER.get())
+                .unlockedBy("has_depot_controller", has(SDItems.DEPOT_CONTROLLER.get()))
+                .save(output, key("depot_terminal"));
+
         // Overflow Chest — Chest + Iron Ingot + Hopper.
         shaped(RecipeCategory.MISC, new ItemStackTemplate(SDItems.OVERFLOW_CHEST.get()))
                 .pattern("C")

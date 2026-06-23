@@ -1,5 +1,6 @@
-// 26.2	2026-06-23T08:20:13.336611	Sorting Depot Recipes
+// 26.2	2026-06-23T13:46:57.707549	Sorting Depot Recipes
 52ebed6c17c4e5f1c46a2356feb66ece8b55e544 data/frostyssortingdepot/advancement/recipes/misc/depot_controller.json
+a4cac33d734b932440988d5906a286573ab2f32e data/frostyssortingdepot/advancement/recipes/misc/depot_terminal.json
 f29faf87b1fd4aaa9a1c0ad3ce3e1c92afc45425 data/frostyssortingdepot/advancement/recipes/misc/filter_card_item.json
 8059a7189965f64442589528871b0ba31d0425f7 data/frostyssortingdepot/advancement/recipes/misc/filter_card_overflow.json
 3ba9a17f468aeb6efdf9a869d562ea24a141a943 data/frostyssortingdepot/advancement/recipes/misc/filter_card_tag.json
@@ -8,6 +9,7 @@ f59b1db742752001a86f0ff2446073d831f4d8be data/frostyssortingdepot/advancement/re
 f2b8690131fd40f42e9fa52c30b692b8a07a8ace data/frostyssortingdepot/advancement/recipes/misc/overflow_chest.json
 0e2c2722637354aa443e55b51f8b7c4ecf28943a data/frostyssortingdepot/advancement/recipes/misc/priority_stamp.json
 3e2aa8a27e550f98000eae71a43a77af50b9b96b data/frostyssortingdepot/recipe/depot_controller.json
+f8c1924af67362bc69b616359d045b374ef0afaf data/frostyssortingdepot/recipe/depot_terminal.json
 9d0442c8e5458142e9045ad3a582e56726844061 data/frostyssortingdepot/recipe/filter_card_item.json
 5f92b5648e0ee2ac603e3c1fc709350e34227e4b data/frostyssortingdepot/recipe/filter_card_overflow.json
 332afe6adc5b64c6416c95dc14e4f78099ad04d1 data/frostyssortingdepot/recipe/filter_card_tag.json

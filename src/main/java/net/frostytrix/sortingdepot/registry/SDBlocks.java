@@ -2,6 +2,7 @@ package net.frostytrix.sortingdepot.registry;
 
 import net.frostytrix.sortingdepot.FrostysSortingDepot;
 import net.frostytrix.sortingdepot.block.DepotControllerBlock;
+import net.frostytrix.sortingdepot.block.DepotTerminalBlock;
 import net.frostytrix.sortingdepot.block.LinkerNodeBlock;
 import net.frostytrix.sortingdepot.block.OverflowChestBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -34,6 +35,11 @@ public final class SDBlocks {
     public static final DeferredBlock<OverflowChestBlock> OVERFLOW_CHEST =
             BLOCKS.registerBlock("overflow_chest", OverflowChestBlock::new,
                     p -> p.mapColor(MapColor.WOOD).strength(2.0F).sound(SoundType.WOOD));
+
+    /** Read-only network dashboard, placed adjacent to a Controller. */
+    public static final DeferredBlock<DepotTerminalBlock> DEPOT_TERMINAL =
+            BLOCKS.registerBlock("depot_terminal", DepotTerminalBlock::new,
+                    p -> p.mapColor(MapColor.METAL).strength(1.5F).sound(SoundType.METAL).requiresCorrectToolForDrops());
 
     public static void register(IEventBus modEventBus) {
         BLOCKS.register(modEventBus);

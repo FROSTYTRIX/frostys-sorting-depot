@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "frostyssortingdepot:block/depot_terminal"
+    }
+  }
+}

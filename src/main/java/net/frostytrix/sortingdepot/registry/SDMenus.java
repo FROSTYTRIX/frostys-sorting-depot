@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import net.frostytrix.sortingdepot.FrostysSortingDepot;
 import net.frostytrix.sortingdepot.gui.DepotControllerMenu;
+import net.frostytrix.sortingdepot.gui.DepotTerminalMenu;
 import net.frostytrix.sortingdepot.gui.LinkerNodeMenu;
 import net.frostytrix.sortingdepot.gui.OverflowChestMenu;
 import net.minecraft.core.registries.Registries;
@@ -31,6 +32,9 @@ public final class SDMenus {
 
     public static final Supplier<MenuType<DepotControllerMenu>> DEPOT_CONTROLLER =
             MENUS.register("depot_controller", () -> IMenuTypeExtension.create(DepotControllerMenu::new));
+
+    public static final Supplier<MenuType<DepotTerminalMenu>> DEPOT_TERMINAL =
+            MENUS.register("depot_terminal", () -> IMenuTypeExtension.create(DepotTerminalMenu::new));
 
     public static void register(IEventBus modEventBus) {
         MENUS.register(modEventBus);

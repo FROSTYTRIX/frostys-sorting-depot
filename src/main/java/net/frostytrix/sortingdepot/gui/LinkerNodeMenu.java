@@ -25,6 +25,7 @@ public class LinkerNodeMenu extends AbstractContainerMenu {
 
     private final LinkerNodeBlockEntity node;
     private final ContainerLevelAccess access;
+    private boolean linked; // synced to client for the status display
 
     /** Client-side constructor: resolves the block entity from the synced position. */
     public LinkerNodeMenu(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf data) {
@@ -53,6 +54,19 @@ public class LinkerNodeMenu extends AbstractContainerMenu {
             }
         });
 
+        // Sync whether this node is registered to a Controller.
+        addDataSlot(new DataSlot() {
+            @Override
+            public int get() {
+                return node.getControllerPos() != null ? 1 : 0;
+            }
+
+            @Override
+            public void set(int value) {
+                linked = value != 0;
+            }
+        });
+
         // Player inventory (3 rows) then hotbar.
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
@@ -74,6 +88,11 @@ public class LinkerNodeMenu extends AbstractContainerMenu {
 
     public LinkerNodeBlockEntity getNode() {
         return node;
+    }
+
+    /** Whether this node is registered to a Controller (synced to the client). */
+    public boolean isLinked() {
+        return linked;
     }
 
     @Override

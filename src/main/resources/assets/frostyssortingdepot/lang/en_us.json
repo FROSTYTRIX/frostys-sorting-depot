@@ -24,6 +24,15 @@
   "block.frostyssortingdepot.linker_node": "Linker Node",
   "block.frostyssortingdepot.depot_controller": "Depot Controller",
   "block.frostyssortingdepot.overflow_chest": "Overflow Chest",
+  "block.frostyssortingdepot.depot_terminal": "Depot Terminal",
+  "block.frostyssortingdepot.depot_terminal.no_controller": "No Depot Controller adjacent",
+
+  "gui.frostyssortingdepot.linker_node.linked": "Linked to Controller",
+  "gui.frostyssortingdepot.linker_node.unlinked": "Not linked",
+
+  "gui.frostyssortingdepot.terminal.empty": "No Linker Nodes registered",
+  "gui.frostyssortingdepot.terminal.overflow": "Overflow: %s",
+  "gui.frostyssortingdepot.terminal.buffer": "Buffer: %s",
 
   "frostyssortingdepot.configuration.title": "Frosty's Sorting Depot Configs",
   "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml": "Frosty's Sorting Depot Configs",

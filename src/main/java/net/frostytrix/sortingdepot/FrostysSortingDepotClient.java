@@ -1,6 +1,7 @@
 package net.frostytrix.sortingdepot;
 
 import net.frostytrix.sortingdepot.gui.DepotControllerScreen;
+import net.frostytrix.sortingdepot.gui.DepotTerminalScreen;
 import net.frostytrix.sortingdepot.gui.LinkerNodeScreen;
 import net.frostytrix.sortingdepot.gui.OverflowChestScreen;
 import net.frostytrix.sortingdepot.registry.SDMenus;
@@ -22,5 +23,6 @@ public class FrostysSortingDepotClient {
         event.register(SDMenus.LINKER_NODE.get(), LinkerNodeScreen::new);
         event.register(SDMenus.OVERFLOW_CHEST.get(), OverflowChestScreen::new);
         event.register(SDMenus.DEPOT_CONTROLLER.get(), DepotControllerScreen::new);
+        event.register(SDMenus.DEPOT_TERMINAL.get(), DepotTerminalScreen::new);
     }
 }

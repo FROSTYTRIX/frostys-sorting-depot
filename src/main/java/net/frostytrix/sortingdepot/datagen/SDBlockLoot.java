@@ -25,6 +25,7 @@ public class SDBlockLoot extends BlockLootSubProvider {
         dropSelf(SDBlocks.LINKER_NODE.get());
         dropSelf(SDBlocks.DEPOT_CONTROLLER.get());
         dropSelf(SDBlocks.OVERFLOW_CHEST.get());
+        dropSelf(SDBlocks.DEPOT_TERMINAL.get());
     }
 
     @Override
