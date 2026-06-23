@@ -12,8 +12,6 @@ import net.frostytrix.sortingdepot.routing.RoutingEngine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -94,27 +92,15 @@ public class DepotControllerBlockEntity extends BlockEntity {
 
     // --- ticking / routing ---------------------------------------------------------------------
 
-    /** Throttle so the routing click never plays more than a few times a second. */
-    private int soundCooldown;
-
     public static void serverTick(Level level, BlockPos pos, BlockState state, DepotControllerBlockEntity be) {
-        if (be.soundCooldown > 0) {
-            be.soundCooldown--;
-        }
         // Idle controllers do nothing (no energy, no work when the buffer is empty).
         if (ItemUtil.getStack(be.input, 0).isEmpty()) {
             return;
         }
-        boolean routed = be.route(level);
-        boolean clearedBuffer = ItemUtil.getStack(be.input, 0).isEmpty();
-        if (routed && clearedBuffer && be.soundCooldown == 0) {
-            // A soft mechanical click when a batch finishes sorting.
-            level.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 0.2F, 1.5F);
-            be.soundCooldown = 6;
-        }
+        be.route(level);
     }
 
-    private boolean route(Level level) {
+    private void route(Level level) {
         ItemStack remaining = ItemUtil.getStack(input, 0);
         boolean changed = false;
 
@@ -162,7 +148,6 @@ public class DepotControllerBlockEntity extends BlockEntity {
             input.set(0, ItemResource.of(remaining), remaining.getCount());
             setChanged();
         }
-        return changed;
     }
 
     /** The handler of an Overflow Chest adjacent to this Controller, or {@code null} if there is none. */
