@@ -1,5 +1,10 @@
 package net.frostytrix.sortingdepot.datagen;
 
+import java.util.List;
+import java.util.Set;
+
+import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 /**
@@ -14,5 +19,10 @@ public final class SDDataGenerators {
     public static void gatherData(GatherDataEvent.Client event) {
         event.createProvider(SDRecipeProvider.Runner::new);
         event.createProvider(SDItemModelProvider::new);
+        event.createProvider((output, lookup) -> new LootTableProvider(
+                output,
+                Set.of(),
+                List.of(new LootTableProvider.SubProviderEntry(SDBlockLoot::new, LootContextParamSets.BLOCK)),
+                lookup));
     }
 }

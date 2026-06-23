@@ -14,6 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -171,6 +172,15 @@ public class DepotControllerBlockEntity extends BlockEntity {
     }
 
     // --- persistence ---------------------------------------------------------------------------
+
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        ItemStack buffered = ItemUtil.getStack(input, 0);
+        if (level != null && !buffered.isEmpty()) {
+            Block.popResource(level, pos, buffered);
+        }
+    }
 
     @Override
     protected void saveAdditional(ValueOutput output) {

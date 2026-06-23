@@ -96,8 +96,10 @@ public final class SelfTest {
         int inOverflow = countItem(level, overflowPos, Items.DIRT);
         int afterOverflow = ItemUtil.getStack(controller.getInputHandler(), 0).getCount();
 
-        // Scenario 3 (bug repro): destroy the Linker Node, its chest, AND the Overflow Chest, then feed
-        // an item. With nothing able to accept it, it must stay safely in the buffer — never voided.
+        // Scenario 3: tear the whole network down, then feed a fresh item. With nothing able to accept it,
+        // it must stay safely in the buffer — never voided. (Content-drop-on-break is handled by each block
+        // entity's preRemoveSideEffects; it can't be asserted here because this runs before the world ticks,
+        // so dropped item entities aren't indexed yet — verify it in-game by breaking a filled block.)
         level.setBlockAndUpdate(linkerPos, Blocks.AIR.defaultBlockState());
         level.setBlockAndUpdate(chestPos, Blocks.AIR.defaultBlockState());
         level.setBlockAndUpdate(overflowPos, Blocks.AIR.defaultBlockState());
@@ -106,11 +108,11 @@ public final class SelfTest {
 
         boolean matchOk = inChest == TEST_COUNT && afterMatch == 0;
         boolean overflowOk = inOverflow == TEST_COUNT && afterOverflow == 0;
-        boolean noVoidOk = strandedInInput == TEST_COUNT; // preserved, not lost
+        boolean noVoidOk = strandedInInput == TEST_COUNT;
         if (matchOk && overflowOk && noVoidOk) {
             FrostysSortingDepot.LOGGER.info(
                     "[SD-SELFTEST] PASS: match->chest ({}), unmatched->overflow ({}), "
-                            + "no-target items stay buffered ({}, not voided)",
+                            + "no-target items stay buffered ({}, never voided)",
                     inChest, inOverflow, strandedInInput);
         } else {
             fail("match{chest=" + inChest + ",input=" + afterMatch + "} overflow{chest=" + inOverflow

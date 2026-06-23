@@ -8,6 +8,7 @@ import net.frostytrix.sortingdepot.routing.FilterMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -96,6 +97,15 @@ public class LinkerNodeBlockEntity extends BlockEntity {
     public void setControllerPos(@Nullable BlockPos controllerPos) {
         this.controllerPos = controllerPos;
         setChanged();
+    }
+
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        ItemStack card = getFilterCard();
+        if (level != null && !card.isEmpty()) {
+            Block.popResource(level, pos, card);
+        }
     }
 
     @Override

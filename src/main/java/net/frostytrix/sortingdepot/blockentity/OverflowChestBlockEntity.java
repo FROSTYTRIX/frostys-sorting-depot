@@ -3,11 +3,13 @@ package net.frostytrix.sortingdepot.blockentity;
 import net.frostytrix.sortingdepot.registry.SDBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemUtil;
 
 /**
  * The network's catch-all. A 27-slot inventory the Controller routes to when no Linker Node accepts an
@@ -30,6 +32,20 @@ public class OverflowChestBlockEntity extends BlockEntity {
 
     public ItemStacksResourceHandler getHandler() {
         return items;
+    }
+
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (level == null) {
+            return;
+        }
+        for (int slot = 0; slot < items.size(); slot++) {
+            ItemStack stack = ItemUtil.getStack(items, slot);
+            if (!stack.isEmpty()) {
+                Block.popResource(level, pos, stack);
+            }
+        }
     }
 
     @Override
