@@ -60,8 +60,6 @@ neoForge {
             server()
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-            // Dev-only: runs net.frostytrix.sortingdepot.debug.SelfTest on server start.
-            systemProperty 'sd.selftest', 'true'
         }
 
         // This run config launches GameTestServer and runs all registered gametests, then exits.
