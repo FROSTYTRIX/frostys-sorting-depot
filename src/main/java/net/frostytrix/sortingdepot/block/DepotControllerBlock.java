@@ -1,8 +1,13 @@
 package net.frostytrix.sortingdepot.block;
 
 import net.frostytrix.sortingdepot.blockentity.DepotControllerBlockEntity;
+import net.frostytrix.sortingdepot.gui.DepotControllerMenu;
 import net.frostytrix.sortingdepot.registry.SDBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -10,6 +15,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -33,5 +39,15 @@ public class DepotControllerBlock extends Block implements EntityBlock {
             return null;
         }
         return (lvl, pos, st, be) -> DepotControllerBlockEntity.serverTick(lvl, pos, st, (DepotControllerBlockEntity) be);
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof DepotControllerBlockEntity controller) {
+            player.openMenu(new SimpleMenuProvider(
+                    (id, inv, p) -> new DepotControllerMenu(id, inv, controller),
+                    Component.translatable("block.frostyssortingdepot.depot_controller")), pos);
+        }
+        return InteractionResult.SUCCESS;
     }
 }

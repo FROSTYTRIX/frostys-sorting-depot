@@ -68,6 +68,12 @@ Block textures go in `src/main/resources/assets/frostyssortingdepot/textures/blo
 
 ### Coming later
 
-Depot Controller, Overflow Chest, and (Phase 6) Depot Terminal block textures — I'll add specs here as
-each block lands. The Linker GUI (Phase 3B) will also need a container background:
-`textures/gui/container/linker_node.png` (176×166 standard) — spec to follow when we build that screen.
+Depot Controller and Overflow Chest block textures (cube faces), plus (Phase 6) Depot Terminal.
+
+**GUI container backgrounds** (`textures/gui/container/<name>.png`, 256×256 canvas, content in the top-left
+176×166):
+- `linker_node.png` — single Filter Card slot centered (~80,35).
+- `depot_controller.png` — single input-buffer slot near the top (~80,20); label space for "Buffer".
+- The **Overflow Chest GUI needs no texture** — it reuses vanilla `generic_54.png`.
+
+Both custom GUIs render with the missing-texture placeholder until these exist, but are fully functional.

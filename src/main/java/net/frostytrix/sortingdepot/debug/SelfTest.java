@@ -96,15 +96,26 @@ public final class SelfTest {
         int inOverflow = countItem(level, overflowPos, Items.DIRT);
         int afterOverflow = ItemUtil.getStack(controller.getInputHandler(), 0).getCount();
 
+        // Scenario 3 (bug repro): destroy the Linker Node, its chest, AND the Overflow Chest, then feed
+        // an item. With nothing able to accept it, it must stay safely in the buffer — never voided.
+        level.setBlockAndUpdate(linkerPos, Blocks.AIR.defaultBlockState());
+        level.setBlockAndUpdate(chestPos, Blocks.AIR.defaultBlockState());
+        level.setBlockAndUpdate(overflowPos, Blocks.AIR.defaultBlockState());
+        feedAndRoute(level, controller, controllerPos, controllerState, Items.GOLD_INGOT);
+        int strandedInInput = ItemUtil.getStack(controller.getInputHandler(), 0).getCount();
+
         boolean matchOk = inChest == TEST_COUNT && afterMatch == 0;
         boolean overflowOk = inOverflow == TEST_COUNT && afterOverflow == 0;
-        if (matchOk && overflowOk) {
+        boolean noVoidOk = strandedInInput == TEST_COUNT; // preserved, not lost
+        if (matchOk && overflowOk && noVoidOk) {
             FrostysSortingDepot.LOGGER.info(
-                    "[SD-SELFTEST] PASS: matched item -> linked chest ({}), unmatched -> Overflow Chest ({})",
-                    inChest, inOverflow);
+                    "[SD-SELFTEST] PASS: match->chest ({}), unmatched->overflow ({}), "
+                            + "no-target items stay buffered ({}, not voided)",
+                    inChest, inOverflow, strandedInInput);
         } else {
             fail("match{chest=" + inChest + ",input=" + afterMatch + "} overflow{chest=" + inOverflow
-                    + ",input=" + afterOverflow + "}", all, level);
+                    + ",input=" + afterOverflow + "} novoid{buffered=" + strandedInInput + "/" + TEST_COUNT + "}",
+                    all, level);
         }
 
         all.forEach(p -> level.setBlockAndUpdate(p, Blocks.AIR.defaultBlockState()));
