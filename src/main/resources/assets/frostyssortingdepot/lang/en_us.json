@@ -12,6 +12,7 @@
 
   "item.frostyssortingdepot.priority_stamp": "Priority Stamp",
   "item.frostyssortingdepot.priority_stamp.value": "Priority: %s",
+  "item.frostyssortingdepot.priority_stamp.applied": "Priority set to %s",
 
   "item.frostyssortingdepot.linker": "Linker",
   "item.frostyssortingdepot.linker.unlinked": "Unlinked",

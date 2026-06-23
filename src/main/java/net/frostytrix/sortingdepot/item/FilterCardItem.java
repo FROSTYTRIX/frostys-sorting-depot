@@ -5,11 +5,14 @@ import java.util.function.Consumer;
 import net.frostytrix.sortingdepot.item.component.FilterCardData;
 import net.frostytrix.sortingdepot.registry.SDDataComponents;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -45,6 +48,24 @@ public class FilterCardItem extends Item {
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
+    }
+
+    /**
+     * Right-click this card (on the cursor) onto an item stack in a GUI to bind it to that item
+     * (switches the card to Item mode). Returns {@code true} to consume the click instead of swapping.
+     */
+    @Override
+    public boolean overrideStackedOnOther(ItemStack stack, Slot other, ClickAction action, Player player) {
+        if (action != ClickAction.SECONDARY) {
+            return false;
+        }
+        ItemStack target = other.getItem();
+        if (target.isEmpty() || target.getItem() instanceof FilterCardItem) {
+            return false;
+        }
+        Identifier id = BuiltInRegistries.ITEM.getKey(target.getItem());
+        stack.set(SDDataComponents.FILTER_DATA.get(), FilterCardData.ofItem(id, false));
+        return true;
     }
 
     @Override
