@@ -33,15 +33,16 @@ public class DepotControllerMenu extends AbstractContainerMenu {
         super(SDMenus.DEPOT_CONTROLLER.get(), containerId);
         this.access = ContainerLevelAccess.create(controller.getLevel(), controller.getBlockPos());
 
-        addSlot(new ResourceHandlerSlot(controller.getInputHandler(), controller.getInputHandler()::set, 0, 80, 20));
+        // Compact layout: single input slot up top, player inventory directly below (no chest-sized gap).
+        addSlot(new ResourceHandlerSlot(controller.getInputHandler(), controller.getInputHandler()::set, 0, 80, 18));
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(playerInventory, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
+                addSlot(new Slot(playerInventory, col + row * 9 + 9, 8 + col * 18, 51 + row * 18));
             }
         }
         for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(playerInventory, col, 8 + col * 18, 142));
+            addSlot(new Slot(playerInventory, col, 8 + col * 18, 109));
         }
     }
 

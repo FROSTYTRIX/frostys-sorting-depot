@@ -33,49 +33,92 @@ The model JSONs already point at these paths, so the items render as soon as the
 
 ## 2. Priority Stamp — `priority_stamp.png`
 
-**Reads as:** a handheld rubber-stamp tool that imprints a priority. Crafted from iron ingot + redstone torch.
+**Reads as:** an upright office-style rubber stamp you press down to imprint a 1–5 priority. Crafted from
+an iron ingot + a redstone torch. In-world it's right-clicked onto a Linker Node to set its priority, and
+held normally (flat item, no handheld).
 
-- A **stamp**: short vertical iron handle, wider stamp base at the bottom.
-- A **redstone-red glowing dot/gem** set into the base or the top knob (the redstone-torch reference) —
-  signals it "stamps" a value.
-- Optional: 1–2 tiny red pips on the stamp face hinting at a number/level (keep abstract at 16px).
-- A small **cyan glint** on the iron handle to tie it to the set.
+Layout (upright, occupying the center column of the 16×16):
+- **Top — handle knob:** a rounded iron knob/cap at rows ~2–4, ~6px wide, centered. Iron shading
+  (hi `#d8dde3` top-left, shadow `#6e7681` bottom-right). This is what the hand "presses."
+- **Middle — shaft:** a narrow iron post (~3–4px wide) from the knob down to the base, rows ~5–10.
+- **Bottom — stamp base/foot:** a wider iron block, ~10px across, rows ~11–14, sitting flat (the part that
+  stamps). Give it a 1px dark underline so it reads as resting on a surface.
+- **Redstone detail:** a single **glowing redstone-red gem** (`#ff5a4d` core, `#c91e1e` edge) embedded
+  where the shaft meets the base — the "ink/charge" that does the imprint. One pixel of glow bleed is plenty.
+- **Frosty accent:** one small **cyan** glint pixel (`#4fd0d6`) on the iron knob's top-left highlight.
+- Keep the silhouette readable at inventory scale: knob ▸ shaft ▸ foot, clearly three stacked masses.
 
-## 3. Linker — `linker.png`
+## 3. Linker — `linker.png` *(handheld — drawn for in-hand rendering)*
 
-**Reads as:** a linking wand/tool that ties an inventory to the network. Crafted from iron ingot + redstone + stick.
+**Reads as:** a pointer/wand tool you aim at blocks to wire them up. Crafted from iron ingot + redstone +
+stick. **Now a handheld item** (`minecraft:item/handheld`), so it renders gripped in the hand like a sword
+or wand — **draw it on the standard lower-left ➜ upper-right diagonal** with the **grip at the bottom-left**
+corner (that's where the hand holds it) and the **business end at the top-right**.
 
-- A short diagonal **rod**: brown wooden **stick handle** (lower-left) into an **iron head** (upper-right).
-- A **redstone-red node** at the tip that "emits" the link.
-- A subtle **cyan connecting motif** — e.g., 2–3 cyan dots trailing from the tip, suggesting a link being made.
-- Should feel like a tool you point at a chest.
+- **Handle (bottom-left):** a short brown **wooden stick** grip (hi `#6b4f2a`, shadow `#4a3519`), maybe with
+  one iron band/ferrule where it meets the head.
+- **Head (top-right):** a tapered **iron** tip/emitter.
+- **Tip node:** a **redstone-red** node/lens at the very tip (`#ff5a4d`/`#c91e1e`) — the part that "links."
+- **Frosty accent:** 2–3 small **cyan** dots trailing off the tip, suggesting a beam/link being cast.
+- Because it's handheld, avoid important detail in the extreme bottom-left ~2px (partly hidden by the fist).
 
 ---
 
-## Blocks (Phase 3)
+## Block textures
 
-Block textures go in `src/main/resources/assets/frostyssortingdepot/textures/block/<name>.png` (16×16).
+Block textures go in `src/main/resources/assets/frostyssortingdepot/textures/block/<name>.png`, **16×16 per
+face**. Each block is currently a single all-faces cube (one `<name>.png` used on every side). If you want a
+distinct front/side/top for any of them, supply `_front` / `_side` / `_top` variants and I'll switch that
+block's model to a multi-face (and, for the Linker Node, facing-aware) model. Keep the **iron palette** and
+the **cyan Frosty accent** consistent so the set reads as one machine family; use the **redstone-red** as a
+status/active color.
 
 ### Linker Node — `linker_node.png`
 
-**Reads as:** a compact iron device you mount facing a chest, with a slot for a Filter Card.
+**Reads as:** a compact iron junction box you mount on/facing a chest; it holds one Filter Card.
+- Iron housing with a riveted/paneled border (corner rivets, a 1px bevel).
+- A **card slot**: a thin recessed dark rectangle across the face (where the Filter Card seats), with a tiny
+  sliver of paper-cream peeking out so it reads as "a card goes here."
+- A small **redstone-red status pip** in a corner + a **cyan accent** stripe along one edge.
+- *(If you do a `_front`, put the slot + pip there; sides/top can be plain riveted iron.)*
 
-- Iron-housing cube, riveted/paneled like a small machine.
-- A visible **card slot** (thin dark rectangle) on the face, hinting the Filter Card goes in.
-- A **redstone-red status pip** + the **cyan accent** so it matches the item set.
-- Currently rendered as an all-faces cube (one texture). If you want a distinct front, supply
-  `_front` / `_side` / `_top` variants and I'll switch the model to a facing-aware one.
+### Depot Controller — `depot_controller.png`
 
-### Coming later
+**Reads as:** the brain/hub of the network — beefier and busier than the Linker Node.
+- Darker, heavier iron block; thicker frame, more rivets — clearly the "main unit."
+- A **central indicator**: a round redstone-red lens/eye or a small 2×2 LED cluster, slightly glowing.
+- A hint of a **top intake** (a hopper-like notch/funnel along the top edge) since items feed in from above,
+  and a faint **comparator notch** vibe on one side.
+- **Cyan** accent trim to match. Should feel like the most important block of the set.
 
-Depot Controller and Overflow Chest block textures (cube faces), plus (Phase 6) Depot Terminal.
+### Overflow Chest — `overflow_chest.png`
 
-**GUI container backgrounds** (`textures/gui/container/<name>.png`, 256×256 canvas, content in the top-left
-176×166):
-- `linker_node.png` — single Filter Card slot centered (~80,35); leaves room for "Priority" / status text top-left.
-- `depot_controller.png` — single input-buffer slot near the top (~80,20); label space for "Buffer".
-- `depot_terminal.png` — **200×180** dashboard panel (no slots); space for ~8 text rows under the title plus
-  two footer lines. The list/footer text is drawn over it.
+**Reads as:** a rugged catch-all bin — the one **wood-toned** block in the set (it's the "chest").
+- Wooden crate/barrel body (wood palette: hi `#6b4f2a`, shadow `#4a3519`) with **iron banding/corners**.
+- An **overflow motif**: a downward iron funnel or chevrons on the front, or a slightly open lid, signaling
+  "things fall in here."
+- A small **cyan** tag/label so it still reads as part of the family despite the wood.
+
+### Depot Terminal — `depot_terminal.png`
+
+**Reads as:** a wall-mounted monitor/dashboard panel.
+- Iron frame around a dark **screen** face (near-black `#1a1f24`) showing faint **cyan** scanlines or a few
+  tiny cyan list-row glyphs (echoing the dashboard it opens).
+- One small **redstone-red power pip** in a corner.
+- Reads clearly as a "screen on a box."
+
+## GUI container backgrounds
+
+`textures/gui/container/<name>.png`, **256×256 canvas**, artwork anchored top-left at the given size; the
+slot/text positions below are where the code draws controls/labels.
+
+- `linker_node.png` — **176×166**. One Filter Card slot centered at ~(80,35); leave clear space top-left for
+  "Priority: N" and a linked/unlinked status line (~rows 20 & 31).
+- `depot_controller.png` — **176×133** (compact, *not* chest-height). One input-buffer slot at ~(80,18);
+  player inventory begins at y≈51. Leave label room near the slot for "Buffer".
+- `depot_terminal.png` — **200×180** dashboard panel, **no slots**. Room for ~8 text rows starting at y≈18
+  (down to ~y≈106), then two footer lines near the bottom (overflow %, buffer). A scroll-arrow may draw at
+  the top-right when the list overflows. A subtle ruled-list look helps.
 - The **Overflow Chest GUI needs no texture** — it reuses vanilla `generic_54.png`.
 
-Both custom GUIs render with the missing-texture placeholder until these exist, but are fully functional.
+All custom GUIs render with the missing-texture placeholder until these exist, but are fully functional.

@@ -27,7 +27,8 @@ public class SDItemModelProvider extends ModelProvider {
         // Items.
         itemModels.generateFlatItem(SDItems.FILTER_CARD.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(SDItems.PRIORITY_STAMP.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(SDItems.LINKER.get(), ModelTemplates.FLAT_ITEM);
+        // The Linker is a handheld tool, so it renders in-hand like a sword/wand.
+        itemModels.generateFlatItem(SDItems.LINKER.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
 
         // Blocks (also generates their block-item models). Simple all-faces cubes for now; once the
         // blocks have front/side/top art we can switch to createHorizontallyRotatedBlock for visible facing.

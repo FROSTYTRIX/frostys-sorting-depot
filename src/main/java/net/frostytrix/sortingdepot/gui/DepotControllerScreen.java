@@ -17,7 +17,9 @@ public class DepotControllerScreen extends AbstractContainerScreen<DepotControll
             Identifier.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, "textures/gui/container/depot_controller.png");
 
     public DepotControllerScreen(DepotControllerMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
+        // Compact 176×133 window (single input slot), not a full chest-height container.
+        super(menu, inventory, title, 176, 133);
+        this.inventoryLabelY = this.imageHeight - 94;
     }
 
     @Override
