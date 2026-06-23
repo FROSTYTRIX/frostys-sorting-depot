@@ -4,6 +4,7 @@ import net.frostytrix.sortingdepot.blockentity.DepotControllerBlockEntity;
 import net.frostytrix.sortingdepot.gui.DepotControllerMenu;
 import net.frostytrix.sortingdepot.registry.SDBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
@@ -39,6 +40,18 @@ public class DepotControllerBlock extends Block implements EntityBlock {
             return null;
         }
         return (lvl, pos, st, be) -> DepotControllerBlockEntity.serverTick(lvl, pos, st, (DepotControllerBlockEntity) be);
+    }
+
+    @Override
+    protected boolean hasAnalogOutputSignal(BlockState state) {
+        return true;
+    }
+
+    @Override
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
+        return level.getBlockEntity(pos) instanceof DepotControllerBlockEntity controller
+                ? controller.getComparatorSignal()
+                : 0;
     }
 
     @Override

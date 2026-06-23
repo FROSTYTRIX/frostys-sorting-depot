@@ -12,6 +12,7 @@ import net.frostytrix.sortingdepot.routing.RoutingEngine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -43,6 +44,10 @@ public class DepotControllerBlockEntity extends BlockEntity {
         @Override
         protected void onContentsChanged(int slot, ItemStack stack) {
             setChanged();
+            if (level != null && !level.isClientSide()) {
+                // Keep comparators reading the buffer up to date.
+                level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
+            }
         }
     };
 
@@ -55,6 +60,16 @@ public class DepotControllerBlockEntity extends BlockEntity {
 
     public ItemStacksResourceHandler getInputHandler() {
         return input;
+    }
+
+    /** Redstone signal (0–15) for a comparator: 0 when the buffer is empty, scaling up with how full it is. */
+    public int getComparatorSignal() {
+        ItemStack buffered = ItemUtil.getStack(input, 0);
+        if (buffered.isEmpty()) {
+            return 0;
+        }
+        float fill = (float) buffered.getCount() / Math.max(1, buffered.getMaxStackSize());
+        return Mth.floor(fill * 14.0F) + 1;
     }
 
     public void addLinker(BlockPos pos) {

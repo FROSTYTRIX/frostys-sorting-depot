@@ -115,20 +115,23 @@ public final class SelfTest {
         level.setBlockAndUpdate(overflowPos, Blocks.AIR.defaultBlockState());
         feedAndRoute(level, controller, controllerPos, controllerState, Items.GOLD_INGOT);
         int strandedInInput = ItemUtil.getStack(controller.getInputHandler(), 0).getCount();
+        int signalWhenStuck = controller.getComparatorSignal(); // non-empty buffer -> comparator emits
 
         boolean matchOk = inChest == TEST_COUNT && afterMatch == 0;
         boolean tagOk = logsInChest == TEST_COUNT;
         boolean overflowOk = inOverflow == TEST_COUNT && afterOverflow == 0;
         boolean noVoidOk = strandedInInput == TEST_COUNT;
-        if (matchOk && tagOk && overflowOk && noVoidOk) {
+        boolean comparatorOk = signalWhenStuck > 0;
+        if (matchOk && tagOk && overflowOk && noVoidOk && comparatorOk) {
             FrostysSortingDepot.LOGGER.info(
-                    "[SD-SELFTEST] PASS: item-filter->chest ({}), tag-filter->chest ({}), "
-                            + "unmatched->overflow ({}), no-target items stay buffered ({}, never voided)",
-                    inChest, logsInChest, inOverflow, strandedInInput);
+                    "[SD-SELFTEST] PASS: item-filter->chest ({}), tag-filter->chest ({}), unmatched->overflow ({}), "
+                            + "buffered when stuck ({}, comparator={}), never voided",
+                    inChest, logsInChest, inOverflow, strandedInInput, signalWhenStuck);
         } else {
             fail("item{chest=" + inChest + ",input=" + afterMatch + "} tag{logs=" + logsInChest + "/" + TEST_COUNT
                     + "} overflow{chest=" + inOverflow + ",input=" + afterOverflow + "} "
-                    + "novoid{buffered=" + strandedInInput + "/" + TEST_COUNT + "}", all, level);
+                    + "novoid{buffered=" + strandedInInput + "/" + TEST_COUNT + ",comparator=" + signalWhenStuck + "}",
+                    all, level);
         }
 
         all.forEach(p -> level.setBlockAndUpdate(p, Blocks.AIR.defaultBlockState()));
