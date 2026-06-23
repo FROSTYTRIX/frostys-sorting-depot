@@ -1,8 +1,7 @@
 {
   "sources": [
-    {
-      "type": "single",
-      "resource": "frostyssortingdepot:entity/chest/overflow"
-    }
+    { "type": "single", "resource": "frostyssortingdepot:entity/chest/overflow" },
+    { "type": "single", "resource": "frostyssortingdepot:entity/chest/overflow_left" },
+    { "type": "single", "resource": "frostyssortingdepot:entity/chest/overflow_right" }
   ]
 }
