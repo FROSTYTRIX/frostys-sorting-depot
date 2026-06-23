@@ -21,8 +21,8 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
     private static final Identifier TEXTURE =
             Identifier.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, "textures/gui/container/depot_terminal.png");
     private static final int TEXT_COLOR = 0xFF404040;
-    private static final int VISIBLE_ROWS = 8;
-    private static final int ROW_HEIGHT = 11;
+    private static final int VISIBLE_ROWS = 12;
+    private static final int ROW_HEIGHT = 10;
     private static final int LIST_TOP = 18;
 
     private int scrollOffset;

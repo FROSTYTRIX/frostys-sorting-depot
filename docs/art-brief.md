@@ -116,9 +116,10 @@ slot/text positions below are where the code draws controls/labels.
   "Priority: N" and a linked/unlinked status line (~rows 20 & 31).
 - `depot_controller.png` — **176×133** (compact, *not* chest-height). One input-buffer slot at ~(80,18);
   player inventory begins at y≈51. Leave label room near the slot for "Buffer".
-- `depot_terminal.png` — **200×180** dashboard panel, **no slots**. Room for ~8 text rows starting at y≈18
-  (down to ~y≈106), then two footer lines near the bottom (overflow %, buffer). A scroll-arrow may draw at
-  the top-right when the list overflows. A subtle ruled-list look helps.
+- `depot_terminal.png` — **200×180** dashboard panel, **no slots**. The list area holds **up to 12 text rows**
+  (10px each) from y≈18 down to y≈138; two footer lines (overflow %, buffer) sit at y≈148 and y≈158. A
+  scroll-arrow may draw at the top-right when the list overflows. A subtle ruled-list look helps; keep the
+  y≈18–138 band clear of busy art so the rows stay readable.
 - The **Overflow Chest GUI needs no texture** — it reuses vanilla `generic_54.png`.
 
 All custom GUIs render with the missing-texture placeholder until these exist, but are fully functional.
