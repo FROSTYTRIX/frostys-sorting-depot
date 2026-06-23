@@ -36,4 +36,4 @@ No energy systems. No conduits of its own. Just place, link, and sort.
 - Minecraft 26.2 · NeoForge
 - No dependencies.
 
-> Early alpha — feedback and bug reports very welcome!
+> Version 1.0.0 — feedback and bug reports very welcome!

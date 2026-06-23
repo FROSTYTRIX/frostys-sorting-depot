@@ -2,9 +2,9 @@
 
 All notable changes to Frosty's Sorting Depot are documented here.
 
-## 1.0.0-alpha.1 — Initial release
+## 1.0.0 — 2026-06-23
 
-First public alpha: a complete, purely mechanical sorting network.
+First release: a complete, purely mechanical sorting network.
 
 ### Added
 - **Depot Controller** — routes buffered items to registered destinations on a hopper-style cadence
