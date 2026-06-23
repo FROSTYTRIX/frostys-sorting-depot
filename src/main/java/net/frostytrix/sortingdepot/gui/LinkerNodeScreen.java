@@ -30,4 +30,12 @@ public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
         int y = (this.height - this.imageHeight) / 2;
         graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
     }
+
+    @Override
+    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        super.extractLabels(graphics, mouseX, mouseY);
+        Component priority = Component.translatable(
+                "item.frostyssortingdepot.priority_stamp.value", this.menu.getNode().getPriority());
+        graphics.text(this.font, priority, 8, 20, 0xFF404040, false);
+    }
 }

@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -38,6 +39,19 @@ public class LinkerNodeMenu extends AbstractContainerMenu {
 
         // Filter Card slot (the handler's isValid restricts it to Filter Cards).
         addSlot(new ResourceHandlerSlot(node.getFilterSlot(), node.getFilterSlot()::set, 0, 80, 35));
+
+        // Sync the node's priority to the client so the screen can display it.
+        addDataSlot(new DataSlot() {
+            @Override
+            public int get() {
+                return node.getPriority();
+            }
+
+            @Override
+            public void set(int value) {
+                node.setPriority(value);
+            }
+        });
 
         // Player inventory (3 rows) then hotbar.
         for (int row = 0; row < 3; row++) {
