@@ -3,6 +3,7 @@ package net.frostytrix.sortingdepot.datagen;
 import java.util.List;
 import java.util.Set;
 
+import net.minecraft.data.advancements.AdvancementProvider;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
@@ -24,5 +25,6 @@ public final class SDDataGenerators {
                 Set.of(),
                 List.of(new LootTableProvider.SubProviderEntry(SDBlockLoot::new, LootContextParamSets.BLOCK)),
                 lookup));
+        event.createProvider((output, lookup) -> new AdvancementProvider(output, lookup, List.of(new SDAdvancements())));
     }
 }

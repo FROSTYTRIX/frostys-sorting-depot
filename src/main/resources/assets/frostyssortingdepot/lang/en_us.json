@@ -34,6 +34,17 @@
   "gui.frostyssortingdepot.terminal.overflow": "Overflow: %s",
   "gui.frostyssortingdepot.terminal.buffer": "Buffer: %s",
 
+  "advancements.frostyssortingdepot.root.title": "Sorting Depot",
+  "advancements.frostyssortingdepot.root.description": "Craft a Depot Controller and start sorting",
+  "advancements.frostyssortingdepot.filter.title": "Filtered",
+  "advancements.frostyssortingdepot.filter.description": "Craft a Filter Card",
+  "advancements.frostyssortingdepot.linker.title": "Wired Up",
+  "advancements.frostyssortingdepot.linker.description": "Craft a Linker to register destinations",
+  "advancements.frostyssortingdepot.overflow.title": "Safety Net",
+  "advancements.frostyssortingdepot.overflow.description": "Craft an Overflow Chest so nothing backs up",
+  "advancements.frostyssortingdepot.terminal.title": "At a Glance",
+  "advancements.frostyssortingdepot.terminal.description": "Craft a Depot Terminal to oversee your network",
+
   "frostyssortingdepot.configuration.title": "Frosty's Sorting Depot Configs",
   "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml": "Frosty's Sorting Depot Configs",
   "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml.title": "Frosty's Sorting Depot Configs",

@@ -1,0 +1,32 @@
+{
+  "criteria": {
+    "has_controller": {
+      "conditions": {
+        "items": [
+          {
+            "items": "frostyssortingdepot:depot_controller"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
+    "description": {
+      "translate": "advancements.frostyssortingdepot.root.description"
+    },
+    "icon": {
+      "id": "frostyssortingdepot:depot_controller"
+    },
+    "title": {
+      "translate": "advancements.frostyssortingdepot.root.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_controller"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

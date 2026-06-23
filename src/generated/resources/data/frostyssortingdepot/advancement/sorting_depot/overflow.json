@@ -1,0 +1,32 @@
+{
+  "parent": "frostyssortingdepot:sorting_depot/root",
+  "criteria": {
+    "has_item": {
+      "conditions": {
+        "items": [
+          {
+            "items": "frostyssortingdepot:overflow_chest"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.frostyssortingdepot.overflow.description"
+    },
+    "icon": {
+      "id": "frostyssortingdepot:overflow_chest"
+    },
+    "title": {
+      "translate": "advancements.frostyssortingdepot.overflow.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_item"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

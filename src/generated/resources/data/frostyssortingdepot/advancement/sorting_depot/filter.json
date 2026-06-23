@@ -1,0 +1,32 @@
+{
+  "parent": "frostyssortingdepot:sorting_depot/root",
+  "criteria": {
+    "has_item": {
+      "conditions": {
+        "items": [
+          {
+            "items": "frostyssortingdepot:filter_card"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.frostyssortingdepot.filter.description"
+    },
+    "icon": {
+      "id": "frostyssortingdepot:filter_card"
+    },
+    "title": {
+      "translate": "advancements.frostyssortingdepot.filter.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_item"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
