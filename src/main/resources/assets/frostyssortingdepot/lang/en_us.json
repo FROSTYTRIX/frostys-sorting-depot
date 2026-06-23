@@ -16,8 +16,12 @@
   "item.frostyssortingdepot.linker": "Linker",
   "item.frostyssortingdepot.linker.unlinked": "Unlinked",
   "item.frostyssortingdepot.linker.linked": "Linked to: [%s, %s, %s]",
+  "item.frostyssortingdepot.linker.stored": "Selected Linker Node [%s, %s, %s]",
+  "item.frostyssortingdepot.linker.registered": "Linker Node registered to Controller",
+  "item.frostyssortingdepot.linker.no_selection": "No Linker Node selected — right-click one first",
 
   "block.frostyssortingdepot.linker_node": "Linker Node",
+  "block.frostyssortingdepot.depot_controller": "Depot Controller",
 
   "frostyssortingdepot.configuration.title": "Frosty's Sorting Depot Configs",
   "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml": "Frosty's Sorting Depot Configs",

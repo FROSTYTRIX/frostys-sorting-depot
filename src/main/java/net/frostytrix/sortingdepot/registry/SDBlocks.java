@@ -1,6 +1,7 @@
 package net.frostytrix.sortingdepot.registry;
 
 import net.frostytrix.sortingdepot.FrostysSortingDepot;
+import net.frostytrix.sortingdepot.block.DepotControllerBlock;
 import net.frostytrix.sortingdepot.block.LinkerNodeBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.MapColor;
@@ -22,6 +23,11 @@ public final class SDBlocks {
     public static final DeferredBlock<LinkerNodeBlock> LINKER_NODE =
             BLOCKS.registerBlock("linker_node", LinkerNodeBlock::new,
                     p -> p.mapColor(MapColor.METAL).strength(1.5F).sound(SoundType.METAL).requiresCorrectToolForDrops());
+
+    /** The network hub: items inserted into its top face are routed to registered Linker Nodes. */
+    public static final DeferredBlock<DepotControllerBlock> DEPOT_CONTROLLER =
+            BLOCKS.registerBlock("depot_controller", DepotControllerBlock::new,
+                    p -> p.mapColor(MapColor.METAL).strength(2.0F).sound(SoundType.METAL).requiresCorrectToolForDrops());
 
     public static void register(IEventBus modEventBus) {
         BLOCKS.register(modEventBus);

@@ -3,6 +3,7 @@ package net.frostytrix.sortingdepot.registry;
 import java.util.function.Supplier;
 
 import net.frostytrix.sortingdepot.FrostysSortingDepot;
+import net.frostytrix.sortingdepot.blockentity.DepotControllerBlockEntity;
 import net.frostytrix.sortingdepot.blockentity.LinkerNodeBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -23,6 +24,10 @@ public final class SDBlockEntities {
     public static final Supplier<BlockEntityType<LinkerNodeBlockEntity>> LINKER_NODE =
             BLOCK_ENTITIES.register("linker_node",
                     () -> new BlockEntityType<>(LinkerNodeBlockEntity::new, SDBlocks.LINKER_NODE.get()));
+
+    public static final Supplier<BlockEntityType<DepotControllerBlockEntity>> DEPOT_CONTROLLER =
+            BLOCK_ENTITIES.register("depot_controller",
+                    () -> new BlockEntityType<>(DepotControllerBlockEntity::new, SDBlocks.DEPOT_CONTROLLER.get()));
 
     public static void register(IEventBus modEventBus) {
         BLOCK_ENTITIES.register(modEventBus);

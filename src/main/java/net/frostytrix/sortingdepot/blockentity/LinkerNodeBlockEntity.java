@@ -1,15 +1,19 @@
 package net.frostytrix.sortingdepot.blockentity;
 
+import net.frostytrix.sortingdepot.block.LinkerNodeBlock;
 import net.frostytrix.sortingdepot.item.FilterCardItem;
 import net.frostytrix.sortingdepot.item.PriorityStampItem;
 import net.frostytrix.sortingdepot.registry.SDBlockEntities;
 import net.frostytrix.sortingdepot.routing.FilterMode;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemUtil;
@@ -64,6 +68,16 @@ public class LinkerNodeBlockEntity extends BlockEntity {
             return FilterCardItem.data(card).toFilterMode();
         }
         return null;
+    }
+
+    /** The item capability of the inventory this node faces, or {@code null} if there is none. */
+    public @Nullable ResourceHandler<ItemResource> getTargetHandler() {
+        if (level == null) {
+            return null;
+        }
+        Direction facing = getBlockState().getValue(LinkerNodeBlock.FACING);
+        BlockPos targetPos = worldPosition.relative(facing);
+        return level.getCapability(Capabilities.Item.BLOCK, targetPos, facing.getOpposite());
     }
 
     public int getPriority() {

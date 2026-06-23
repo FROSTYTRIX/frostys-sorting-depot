@@ -40,8 +40,13 @@ public class LinkerNodeBlock extends Block implements EntityBlock {
 
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
-        // Face the player when placed (like a furnace); the served inventory is the block this faces.
-        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+        // Target the block this node is placed against (intuitive: click the chest to feed it). If placed
+        // on a floor/ceiling, fall back to facing away from the player.
+        Direction againstTarget = context.getClickedFace().getOpposite();
+        Direction facing = againstTarget.getAxis().isHorizontal()
+                ? againstTarget
+                : context.getHorizontalDirection().getOpposite();
+        return defaultBlockState().setValue(FACING, facing);
     }
 
     @Override

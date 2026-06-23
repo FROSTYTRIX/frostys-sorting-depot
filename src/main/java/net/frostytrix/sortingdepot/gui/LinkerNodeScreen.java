@@ -7,13 +7,13 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 /**
  * Screen for the Linker Node menu. Standard 176×166 container with a single Filter Card slot.
+ *
+ * <p>Client-only by reference: it is registered solely from the client-dist {@code RegisterMenuScreensEvent}
+ * handler, so it never classloads on a dedicated server — no {@code @OnlyIn} needed.
  */
-@OnlyIn(Dist.CLIENT)
 public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
 
     private static final Identifier TEXTURE =

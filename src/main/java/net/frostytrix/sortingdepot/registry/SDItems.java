@@ -36,6 +36,8 @@ public final class SDItems {
     // Block items. Registered here (not in SDBlocks) so all item-registry entries live in one place.
     public static final DeferredItem<BlockItem> LINKER_NODE =
             ITEMS.registerSimpleBlockItem("linker_node", SDBlocks.LINKER_NODE);
+    public static final DeferredItem<BlockItem> DEPOT_CONTROLLER =
+            ITEMS.registerSimpleBlockItem("depot_controller", SDBlocks.DEPOT_CONTROLLER);
 
     /** Single creative tab holding everything the mod adds. */
     public static final Supplier<CreativeModeTab> MAIN_TAB = TABS.register("main", () -> CreativeModeTab.builder()
@@ -46,6 +48,7 @@ public final class SDItems {
                 output.accept(PRIORITY_STAMP.get());
                 output.accept(LINKER.get());
                 output.accept(LINKER_NODE.get());
+                output.accept(DEPOT_CONTROLLER.get());
             })
             .build());
 

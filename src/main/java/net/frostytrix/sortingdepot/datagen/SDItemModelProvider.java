@@ -29,8 +29,9 @@ public class SDItemModelProvider extends ModelProvider {
         itemModels.generateFlatItem(SDItems.PRIORITY_STAMP.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(SDItems.LINKER.get(), ModelTemplates.FLAT_ITEM);
 
-        // Blocks (also generates their block-item models). A simple all-faces cube for now; once the
-        // block has front/side/top art we can switch to createHorizontallyRotatedBlock for visible facing.
+        // Blocks (also generates their block-item models). Simple all-faces cubes for now; once the
+        // blocks have front/side/top art we can switch to createHorizontallyRotatedBlock for visible facing.
         blockModels.createTrivialCube(SDBlocks.LINKER_NODE.get());
+        blockModels.createTrivialCube(SDBlocks.DEPOT_CONTROLLER.get());
     }
 }
