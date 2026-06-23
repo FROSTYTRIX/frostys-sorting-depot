@@ -4,7 +4,7 @@
     "base": "frostyssortingdepot:item/overflow_chest",
     "model": {
       "type": "minecraft:chest",
-      "texture": "frostyssortingdepot:entity/chest/overflow"
+      "texture": "frostyssortingdepot:overflow"
     }
   }
 }

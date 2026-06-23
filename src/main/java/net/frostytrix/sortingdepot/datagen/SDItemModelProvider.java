@@ -43,8 +43,9 @@ public class SDItemModelProvider extends ModelProvider {
         handModeledBlock(blockModels, SDBlocks.DEPOT_CONTROLLER.get(), false);
 
         // Overflow Chest is an entity-rendered chest: particle-only blockstate + a 3D chest item model.
+        // The chest sprite mapper prepends "entity/chest/", so pass the SHORT name (like vanilla "normal").
         blockModels.createChest(SDBlocks.OVERFLOW_CHEST.get(), Blocks.OAK_PLANKS,
-                Identifier.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, "entity/chest/overflow"), false);
+                Identifier.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, "overflow"), false);
     }
 
     /**

@@ -1,4 +1,4 @@
-// 26.2	2026-06-23T23:18:54.214215	Model Definitions - frostyssortingdepot
+// 26.2	2026-06-23T23:37:03.845918	Model Definitions - frostyssortingdepot
 21e55201f5eeef4139b85d4a576aeef339d3ff22 assets/frostyssortingdepot/blockstates/depot_controller.json
 7f7ef6c298f856c84b5c07890f07056e2d3916e8 assets/frostyssortingdepot/blockstates/depot_terminal.json
 4caf3b3189b6f27dd3b9bac8ba0ea59ce9f4138e assets/frostyssortingdepot/blockstates/linker_node.json
@@ -8,7 +8,7 @@ ceaf2e67e104e97ca41d7a0576397b98951ea09c assets/frostyssortingdepot/items/depot_
 fb8178fec9c27f8a0504f934dc7671bf3f0a3710 assets/frostyssortingdepot/items/filter_card.json
 c06d21e4b3529c9a1d0e2c66900460812c6023cc assets/frostyssortingdepot/items/linker.json
 1a4cc1b7d679e614af52b188ab4d64376bb721f0 assets/frostyssortingdepot/items/linker_node.json
-23619a9297b48742a82b05d8d3b7d0ad2b9e441d assets/frostyssortingdepot/items/overflow_chest.json
+e15f0fd864a8b78aac9ac72942c0544368210fc0 assets/frostyssortingdepot/items/overflow_chest.json
 ea34991e6d6f88bf48b93d113a070a1fe8fd8040 assets/frostyssortingdepot/items/priority_stamp.json
 1dbfff9b6cf804221a17378d793fb7f2b00fb35c assets/frostyssortingdepot/models/block/overflow_chest.json
 399bdadb0d39fe3822b1b98edc8d8bc89ccb4b7b assets/frostyssortingdepot/models/item/filter_card.json
