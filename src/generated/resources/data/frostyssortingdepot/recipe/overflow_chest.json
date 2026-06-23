@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "minecraft:chest",
+    "H": "minecraft:hopper",
+    "I": "minecraft:iron_ingot"
+  },
+  "pattern": [
+    "C",
+    "I",
+    "H"
+  ],
+  "result": {
+    "id": "frostyssortingdepot:overflow_chest"
+  }
+}

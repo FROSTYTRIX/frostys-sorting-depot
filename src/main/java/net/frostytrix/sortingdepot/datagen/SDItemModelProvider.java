@@ -33,5 +33,6 @@ public class SDItemModelProvider extends ModelProvider {
         // blocks have front/side/top art we can switch to createHorizontallyRotatedBlock for visible facing.
         blockModels.createTrivialCube(SDBlocks.LINKER_NODE.get());
         blockModels.createTrivialCube(SDBlocks.DEPOT_CONTROLLER.get());
+        blockModels.createTrivialCube(SDBlocks.OVERFLOW_CHEST.get());
     }
 }

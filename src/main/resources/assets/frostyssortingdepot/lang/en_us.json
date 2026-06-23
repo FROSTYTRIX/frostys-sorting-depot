@@ -22,6 +22,7 @@
 
   "block.frostyssortingdepot.linker_node": "Linker Node",
   "block.frostyssortingdepot.depot_controller": "Depot Controller",
+  "block.frostyssortingdepot.overflow_chest": "Overflow Chest",
 
   "frostyssortingdepot.configuration.title": "Frosty's Sorting Depot Configs",
   "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml": "Frosty's Sorting Depot Configs",

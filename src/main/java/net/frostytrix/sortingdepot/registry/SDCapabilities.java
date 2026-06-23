@@ -15,9 +15,16 @@ public final class SDCapabilities {
     }
 
     public static void register(RegisterCapabilitiesEvent event) {
+        // Controller: input buffer on the top face.
         event.registerBlockEntity(
                 Capabilities.Item.BLOCK,
                 SDBlockEntities.DEPOT_CONTROLLER.get(),
                 (be, side) -> (side == null || side == Direction.UP) ? be.getInputHandler() : null);
+
+        // Overflow Chest: full inventory on every face for pipe/hopper extraction.
+        event.registerBlockEntity(
+                Capabilities.Item.BLOCK,
+                SDBlockEntities.OVERFLOW_CHEST.get(),
+                (be, side) -> be.getHandler());
     }
 }

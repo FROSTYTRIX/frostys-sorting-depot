@@ -10,6 +10,7 @@ import net.frostytrix.sortingdepot.routing.FilterMode;
 import net.frostytrix.sortingdepot.routing.RoutableItem;
 import net.frostytrix.sortingdepot.routing.RoutingEngine;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -22,6 +23,7 @@ import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemUtil;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The heart of a sorting network. A single-slot input buffer (exposed as the item capability on the top
@@ -107,14 +109,21 @@ public class DepotControllerBlockEntity extends BlockEntity {
             }
 
             int index = RoutingEngine.chooseTarget(routable, candidates);
-            if (index < 0) {
-                break; // no match or all full — leave the rest in the buffer (Overflow Chest comes later)
+            ResourceHandler<ItemResource> target;
+            if (index >= 0) {
+                target = targets.get(index);
+            } else {
+                // No Linker matched (or all were full): fall back to an adjacent Overflow Chest.
+                target = findOverflow(level);
+                if (target == null) {
+                    break; // no overflow either — leave the rest in the buffer, never voided
+                }
             }
 
             int before = remaining.getCount();
-            remaining = insert(targets.get(index), remaining);
+            remaining = insert(target, remaining);
             if (remaining.getCount() == before) {
-                break; // safety: made no progress, avoid spinning
+                break; // safety: made no progress (everything full), avoid spinning
             }
             changed = true;
         }
@@ -123,6 +132,16 @@ public class DepotControllerBlockEntity extends BlockEntity {
             input.set(0, ItemResource.of(remaining), remaining.getCount());
             setChanged();
         }
+    }
+
+    /** The handler of an Overflow Chest adjacent to this Controller, or {@code null} if there is none. */
+    private @Nullable ResourceHandler<ItemResource> findOverflow(Level level) {
+        for (Direction direction : Direction.values()) {
+            if (level.getBlockEntity(worldPosition.relative(direction)) instanceof OverflowChestBlockEntity overflow) {
+                return overflow.getHandler();
+            }
+        }
+        return null;
     }
 
     /** Builds the Minecraft-free routing snapshot, resolving the item's tags here at the adapter boundary. */

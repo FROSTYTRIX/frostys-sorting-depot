@@ -66,6 +66,37 @@ public class SDRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_redstone_torch", has(Items.REDSTONE_TORCH))
                 .save(output, key("priority_stamp"));
 
+        // Linker Node — Iron + Redstone (cheap; one per destination).
+        shaped(RecipeCategory.MISC, new ItemStackTemplate(SDItems.LINKER_NODE.get()))
+                .pattern("III")
+                .pattern("IRI")
+                .define('I', Items.IRON_INGOT)
+                .define('R', Items.REDSTONE)
+                .unlockedBy("has_redstone", has(Items.REDSTONE))
+                .save(output, key("linker_node"));
+
+        // Depot Controller — Iron Block + Hopper + Comparator (mid-game hub).
+        shaped(RecipeCategory.MISC, new ItemStackTemplate(SDItems.DEPOT_CONTROLLER.get()))
+                .pattern("H")
+                .pattern("B")
+                .pattern("C")
+                .define('H', Items.HOPPER)
+                .define('B', Items.IRON_BLOCK)
+                .define('C', Items.COMPARATOR)
+                .unlockedBy("has_comparator", has(Items.COMPARATOR))
+                .save(output, key("depot_controller"));
+
+        // Overflow Chest — Chest + Iron Ingot + Hopper.
+        shaped(RecipeCategory.MISC, new ItemStackTemplate(SDItems.OVERFLOW_CHEST.get()))
+                .pattern("C")
+                .pattern("I")
+                .pattern("H")
+                .define('C', Items.CHEST)
+                .define('I', Items.IRON_INGOT)
+                .define('H', Items.HOPPER)
+                .unlockedBy("has_hopper", has(Items.HOPPER))
+                .save(output, key("overflow_chest"));
+
         // Linker — Iron Ingot + Redstone + Stick (cheap, players need many).
         shaped(RecipeCategory.MISC, new ItemStackTemplate(SDItems.LINKER.get()))
                 .pattern("I")

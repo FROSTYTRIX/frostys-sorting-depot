@@ -57,7 +57,8 @@ public final class SelfTest {
         BlockPos chestPos = new BlockPos(8, 120, 8);
         BlockPos linkerPos = chestPos.west();        // Linker Node sits west of the chest...
         BlockPos controllerPos = chestPos.above(2);
-        List<BlockPos> all = List.of(chestPos, linkerPos, controllerPos);
+        BlockPos overflowPos = controllerPos.north(); // Overflow Chest adjacent to the Controller.
+        List<BlockPos> all = List.of(chestPos, linkerPos, controllerPos, overflowPos);
 
         all.forEach(p -> level.setBlockAndUpdate(p, Blocks.AIR.defaultBlockState()));
 
@@ -66,6 +67,7 @@ public final class SelfTest {
         level.setBlockAndUpdate(linkerPos,
                 SDBlocks.LINKER_NODE.get().defaultBlockState().setValue(LinkerNodeBlock.FACING, Direction.EAST));
         level.setBlockAndUpdate(controllerPos, SDBlocks.DEPOT_CONTROLLER.get().defaultBlockState());
+        level.setBlockAndUpdate(overflowPos, SDBlocks.OVERFLOW_CHEST.get().defaultBlockState());
 
         if (!(level.getBlockEntity(linkerPos) instanceof LinkerNodeBlockEntity node)) {
             fail("Linker Node block entity missing", all, level);
@@ -82,35 +84,49 @@ public final class SelfTest {
         node.getFilterSlot().set(0, ItemResource.of(card), 1);
         controller.addLinker(linkerPos);
 
-        // Feed the Controller and drive routing.
-        controller.getInputHandler().set(0, ItemResource.of(new ItemStack(Items.COBBLESTONE)), TEST_COUNT);
         BlockState controllerState = level.getBlockState(controllerPos);
-        for (int i = 0; i < 20; i++) {
-            DepotControllerBlockEntity.serverTick(level, controllerPos, controllerState, controller);
-        }
 
-        int inChest = countInChest(level, chestPos);
-        int leftInInput = ItemUtil.getStack(controller.getInputHandler(), 0).getCount();
+        // Scenario 1: a matching item routes to the linked chest.
+        feedAndRoute(level, controller, controllerPos, controllerState, Items.COBBLESTONE);
+        int inChest = countItem(level, chestPos, Items.COBBLESTONE);
+        int afterMatch = ItemUtil.getStack(controller.getInputHandler(), 0).getCount();
 
-        if (inChest == TEST_COUNT && leftInInput == 0) {
+        // Scenario 2: a non-matching item falls through to the Overflow Chest.
+        feedAndRoute(level, controller, controllerPos, controllerState, Items.DIRT);
+        int inOverflow = countItem(level, overflowPos, Items.DIRT);
+        int afterOverflow = ItemUtil.getStack(controller.getInputHandler(), 0).getCount();
+
+        boolean matchOk = inChest == TEST_COUNT && afterMatch == 0;
+        boolean overflowOk = inOverflow == TEST_COUNT && afterOverflow == 0;
+        if (matchOk && overflowOk) {
             FrostysSortingDepot.LOGGER.info(
-                    "[SD-SELFTEST] PASS: routed {} cobblestone Controller -> chest via Linker Node", TEST_COUNT);
+                    "[SD-SELFTEST] PASS: matched item -> linked chest ({}), unmatched -> Overflow Chest ({})",
+                    inChest, inOverflow);
         } else {
-            fail("expected chest=" + TEST_COUNT + " input=0, got chest=" + inChest + " input=" + leftInInput, all, level);
+            fail("match{chest=" + inChest + ",input=" + afterMatch + "} overflow{chest=" + inOverflow
+                    + ",input=" + afterOverflow + "}", all, level);
         }
 
         all.forEach(p -> level.setBlockAndUpdate(p, Blocks.AIR.defaultBlockState()));
     }
 
-    private static int countInChest(ServerLevel level, BlockPos chestPos) {
-        ResourceHandler<ItemResource> chest = level.getCapability(Capabilities.Item.BLOCK, chestPos, null);
-        if (chest == null) {
+    private static void feedAndRoute(ServerLevel level, DepotControllerBlockEntity controller,
+                                     BlockPos controllerPos, BlockState controllerState, net.minecraft.world.item.Item item) {
+        controller.getInputHandler().set(0, ItemResource.of(new ItemStack(item)), TEST_COUNT);
+        for (int i = 0; i < 20; i++) {
+            DepotControllerBlockEntity.serverTick(level, controllerPos, controllerState, controller);
+        }
+    }
+
+    private static int countItem(ServerLevel level, BlockPos pos, net.minecraft.world.item.Item item) {
+        ResourceHandler<ItemResource> handler = level.getCapability(Capabilities.Item.BLOCK, pos, null);
+        if (handler == null) {
             return -1;
         }
         int total = 0;
-        for (int slot = 0; slot < chest.size(); slot++) {
-            ItemStack stack = ItemUtil.getStack(chest, slot);
-            if (stack.getItem() == Items.COBBLESTONE) {
+        for (int slot = 0; slot < handler.size(); slot++) {
+            ItemStack stack = ItemUtil.getStack(handler, slot);
+            if (stack.getItem() == item) {
                 total += stack.getCount();
             }
         }

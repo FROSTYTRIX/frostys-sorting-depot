@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "B": "minecraft:iron_block",
+    "C": "minecraft:comparator",
+    "H": "minecraft:hopper"
+  },
+  "pattern": [
+    "H",
+    "B",
+    "C"
+  ],
+  "result": {
+    "id": "frostyssortingdepot:depot_controller"
+  }
+}

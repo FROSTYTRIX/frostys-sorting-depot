@@ -38,6 +38,8 @@ public final class SDItems {
             ITEMS.registerSimpleBlockItem("linker_node", SDBlocks.LINKER_NODE);
     public static final DeferredItem<BlockItem> DEPOT_CONTROLLER =
             ITEMS.registerSimpleBlockItem("depot_controller", SDBlocks.DEPOT_CONTROLLER);
+    public static final DeferredItem<BlockItem> OVERFLOW_CHEST =
+            ITEMS.registerSimpleBlockItem("overflow_chest", SDBlocks.OVERFLOW_CHEST);
 
     /** Single creative tab holding everything the mod adds. */
     public static final Supplier<CreativeModeTab> MAIN_TAB = TABS.register("main", () -> CreativeModeTab.builder()
@@ -49,6 +51,7 @@ public final class SDItems {
                 output.accept(LINKER.get());
                 output.accept(LINKER_NODE.get());
                 output.accept(DEPOT_CONTROLLER.get());
+                output.accept(OVERFLOW_CHEST.get());
             })
             .build());
 

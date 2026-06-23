@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import net.frostytrix.sortingdepot.FrostysSortingDepot;
 import net.frostytrix.sortingdepot.blockentity.DepotControllerBlockEntity;
 import net.frostytrix.sortingdepot.blockentity.LinkerNodeBlockEntity;
+import net.frostytrix.sortingdepot.blockentity.OverflowChestBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
@@ -28,6 +29,10 @@ public final class SDBlockEntities {
     public static final Supplier<BlockEntityType<DepotControllerBlockEntity>> DEPOT_CONTROLLER =
             BLOCK_ENTITIES.register("depot_controller",
                     () -> new BlockEntityType<>(DepotControllerBlockEntity::new, SDBlocks.DEPOT_CONTROLLER.get()));
+
+    public static final Supplier<BlockEntityType<OverflowChestBlockEntity>> OVERFLOW_CHEST =
+            BLOCK_ENTITIES.register("overflow_chest",
+                    () -> new BlockEntityType<>(OverflowChestBlockEntity::new, SDBlocks.OVERFLOW_CHEST.get()));
 
     public static void register(IEventBus modEventBus) {
         BLOCK_ENTITIES.register(modEventBus);

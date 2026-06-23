@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "R": "minecraft:redstone"
+  },
+  "pattern": [
+    "III",
+    "IRI"
+  ],
+  "result": {
+    "id": "frostyssortingdepot:linker_node"
+  }
+}
