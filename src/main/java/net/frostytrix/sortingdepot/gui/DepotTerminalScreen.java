@@ -8,24 +8,26 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 
 /**
  * Screen for the Depot Terminal: a read-only network dashboard listing each Linker Node's target,
- * filter, and fill, plus the Overflow Chest fill and the Controller's buffer count. Scrolls when there
- * are more registered Linker Nodes than fit.
+ * filter, and fill, plus the Overflow Chest fill and the Controller's buffer count. Rows that are too
+ * wide wrap onto extra lines (keeping the row's left offset, with the fill % trailing at the end); the
+ * list scrolls per-entry when there are more rows than fit.
  */
 public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMenu> {
 
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, "textures/gui/container/depot_terminal.png");
     private static final int TEXT_COLOR = 0xFF404040;
-    private static final int VISIBLE_ROWS = 12;
     private static final int ROW_HEIGHT = 10;
     private static final int LIST_TOP = 18;
+    private static final int LIST_BOTTOM_MARGIN = 36; // reserved for the overflow + buffer lines
 
-    private int scrollOffset;
+    private int scrollOffset; // index of the first entry shown
 
     public DepotTerminalScreen(DepotTerminalMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -33,8 +35,33 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
         this.imageHeight = 180;
     }
 
+    /** Bottom of the entry-drawing area; one row is held back for the scroll indicator. */
+    private int entryAreaBottom() {
+        return this.imageHeight - LIST_BOTTOM_MARGIN - ROW_HEIGHT;
+    }
+
+    private int rowWidth() {
+        return this.imageWidth - 16; // 8px padding on each side
+    }
+
+    /** The wrapped display lines for one entry: {@code target · filter · fill%}, wrapped to the row width. */
+    private List<FormattedCharSequence> entryLines(TerminalSnapshot.Entry entry) {
+        String full = entry.target() + "  ·  " + entry.filter() + "  ·  " + entry.fill() + "%";
+        return this.font.split(Component.literal(full), rowWidth());
+    }
+
+    /** The largest scroll offset that still fills the list from the bottom (so every entry stays reachable). */
     private int maxScroll() {
-        return Math.max(0, this.menu.getSnapshot().linkers().size() - VISIBLE_ROWS);
+        List<TerminalSnapshot.Entry> linkers = this.menu.getSnapshot().linkers();
+        int capacity = entryAreaBottom() - LIST_TOP;
+        int used = 0;
+        for (int i = linkers.size() - 1; i >= 0; i--) {
+            used += entryLines(linkers.get(i)).size() * ROW_HEIGHT;
+            if (used > capacity) {
+                return i + 1;
+            }
+        }
+        return 0;
     }
 
     @Override
@@ -57,23 +84,27 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
         graphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, TEXT_COLOR, false);
 
         List<TerminalSnapshot.Entry> linkers = this.menu.getSnapshot().linkers();
-        int rowWidth = this.imageWidth - 16; // 8px padding on each side
         if (linkers.isEmpty()) {
             graphics.drawString(this.font, Component.translatable("gui.frostyssortingdepot.terminal.empty"),
                     8, LIST_TOP, TEXT_COLOR, false);
         } else {
             scrollOffset = Mth.clamp(scrollOffset, 0, maxScroll());
-            int end = Math.min(linkers.size(), scrollOffset + VISIBLE_ROWS);
+            int bottom = entryAreaBottom();
             int y = LIST_TOP;
-            for (int i = scrollOffset; i < end; i++) {
-                TerminalSnapshot.Entry entry = linkers.get(i);
-                String full = entry.target() + "  ·  " + entry.filter() + "  ·  " + entry.fill() + "%";
-                drawRow(graphics, full, y, rowWidth, mouseX, mouseY);
-                y += ROW_HEIGHT;
+            int i = scrollOffset;
+            for (; i < linkers.size(); i++) {
+                List<FormattedCharSequence> lines = entryLines(linkers.get(i));
+                if (y + lines.size() * ROW_HEIGHT > bottom) {
+                    break; // next entry would overflow the list area
+                }
+                for (FormattedCharSequence line : lines) {
+                    graphics.drawString(this.font, line, 8, y, TEXT_COLOR, false);
+                    y += ROW_HEIGHT;
+                }
             }
-            // Scroll affordances, both arrows together at the bottom of the list.
+            // Scroll affordances, both arrows together below the last drawn entry.
             boolean hasAbove = scrollOffset > 0;
-            boolean hasBelow = end < linkers.size();
+            boolean hasBelow = i < linkers.size();
             if (hasAbove || hasBelow) {
                 StringBuilder indicator = new StringBuilder();
                 if (hasAbove) {
@@ -83,7 +114,7 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
                     if (hasAbove) {
                         indicator.append(' ');
                     }
-                    indicator.append("▼ ").append(linkers.size() - end).append(" more");
+                    indicator.append("▼ ").append(linkers.size() - i).append(" more");
                 }
                 graphics.drawString(this.font, Component.literal(indicator.toString()), 8, y, TEXT_COLOR, false);
             }
@@ -95,29 +126,5 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
                 this.menu.getSnapshot().inputCount());
         graphics.drawString(this.font, overflow, 8, this.imageHeight - 32, TEXT_COLOR, false);
         graphics.drawString(this.font, buffer, 8, this.imageHeight - 22, TEXT_COLOR, false);
-    }
-
-    /**
-     * Draws a row of terminal text, ellipsized to fit {@code rowWidth}; if the row was truncated and the
-     * mouse hovers over it, the full text is shown as a tooltip. {@code mouseX}/{@code mouseY} are
-     * GUI-local in renderLabels; the tooltip API wants screen-space, so {@link #leftPos}/{@link #topPos}
-     * are added back.
-     */
-    private void drawRow(GuiGraphics graphics, String full, int y, int rowWidth, int mouseX, int mouseY) {
-        String shown = fitWidth(full, rowWidth);
-        graphics.drawString(this.font, Component.literal(shown), 8, y, TEXT_COLOR, false);
-        if (!shown.equals(full)
-                && mouseX >= 8 && mouseX < 8 + rowWidth
-                && mouseY >= y && mouseY < y + ROW_HEIGHT - 1) {
-            graphics.renderTooltip(this.font, Component.literal(full), mouseX + this.leftPos, mouseY + this.topPos);
-        }
-    }
-
-    /** Truncates {@code s} with an ellipsis so it fits within {@code maxWidth} pixels. */
-    private String fitWidth(String s, int maxWidth) {
-        if (this.font.width(s) <= maxWidth) {
-            return s;
-        }
-        return this.font.plainSubstrByWidth(s, maxWidth - this.font.width("…")) + "…";
     }
 }
