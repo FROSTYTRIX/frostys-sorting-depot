@@ -24,15 +24,15 @@ public final class SDBlockEntities {
 
     public static final Supplier<BlockEntityType<LinkerNodeBlockEntity>> LINKER_NODE =
             BLOCK_ENTITIES.register("linker_node",
-                    () -> new BlockEntityType<>(LinkerNodeBlockEntity::new, SDBlocks.LINKER_NODE.get()));
+                    () -> BlockEntityType.Builder.of(LinkerNodeBlockEntity::new, SDBlocks.LINKER_NODE.get()).build(null));
 
     public static final Supplier<BlockEntityType<DepotControllerBlockEntity>> DEPOT_CONTROLLER =
             BLOCK_ENTITIES.register("depot_controller",
-                    () -> new BlockEntityType<>(DepotControllerBlockEntity::new, SDBlocks.DEPOT_CONTROLLER.get()));
+                    () -> BlockEntityType.Builder.of(DepotControllerBlockEntity::new, SDBlocks.DEPOT_CONTROLLER.get()).build(null));
 
     public static final Supplier<BlockEntityType<OverflowChestBlockEntity>> OVERFLOW_CHEST =
             BLOCK_ENTITIES.register("overflow_chest",
-                    () -> new BlockEntityType<>(OverflowChestBlockEntity::new, SDBlocks.OVERFLOW_CHEST.get()));
+                    () -> BlockEntityType.Builder.of(OverflowChestBlockEntity::new, SDBlocks.OVERFLOW_CHEST.get()).build(null));
 
     public static void register(IEventBus modEventBus) {
         BLOCK_ENTITIES.register(modEventBus);

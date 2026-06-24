@@ -14,16 +14,18 @@ import net.minecraft.world.level.block.state.properties.ChestType;
  * while reusing the vanilla {@link ChestRenderer} for the model and lid animation. A double chest uses
  * distinct left/right halves, exactly like vanilla's {@code normal_left}/{@code normal_right}.
  *
- * <p>{@link Sheets#CHEST_MAPPER} prepends {@code entity/chest/}, so the short sprite names are passed.
+ * <p>1.21.1 does not have {@code Sheets.CHEST_MAPPER}, so the {@link Material}s are built directly with
+ * the {@code entity/chest/} prefix that the chest atlas expects.
  */
 public class OverflowChestRenderer extends ChestRenderer<OverflowChestBlockEntity> {
 
-    private static final Material SINGLE = material("overflow");
-    private static final Material LEFT = material("overflow_left");
-    private static final Material RIGHT = material("overflow_right");
+    private static final Material SINGLE = material("entity/chest/overflow");
+    private static final Material LEFT = material("entity/chest/overflow_left");
+    private static final Material RIGHT = material("entity/chest/overflow_right");
 
-    private static Material material(String shortName) {
-        return Sheets.CHEST_MAPPER.apply(ResourceLocation.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, shortName));
+    private static Material material(String path) {
+        return new Material(Sheets.CHEST_SHEET,
+                ResourceLocation.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, path));
     }
 
     public OverflowChestRenderer(BlockEntityRendererProvider.Context context) {

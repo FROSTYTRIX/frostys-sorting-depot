@@ -2,9 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "D": "frostyssortingdepot:depot_controller",
-    "G": "minecraft:glass_pane",
-    "R": "minecraft:redstone"
+    "D": {
+      "item": "frostyssortingdepot:depot_controller"
+    },
+    "G": {
+      "item": "minecraft:glass_pane"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
   },
   "pattern": [
     "R",

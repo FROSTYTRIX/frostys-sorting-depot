@@ -13,6 +13,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -97,11 +99,13 @@ public class LinkerNodeBlockEntity extends BlockEntity {
         setChanged();
     }
 
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
+    /**
+     * Drops the inserted Filter Card at {@code pos}. Called from the block's {@code onRemove} hook
+     * because 1.21.1 has no {@code preRemoveSideEffects} on {@code BlockEntity}.
+     */
+    public void dropContents(net.minecraft.world.level.Level level, BlockPos pos) {
         ItemStack card = getFilterCard();
-        if (level != null && !card.isEmpty()) {
+        if (!card.isEmpty()) {
             Block.popResource(level, pos, card);
         }
     }
@@ -111,14 +115,19 @@ public class LinkerNodeBlockEntity extends BlockEntity {
         super.saveAdditional(output, registries);
         output.put(FILTER_SLOT_KEY, filterSlot.serializeNBT(registries));
         output.putInt("priority", priority);
-        output.storeNullable("controller", BlockPos.CODEC, controllerPos);
+        if (controllerPos != null) {
+            output.put("controller", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, controllerPos).getOrThrow());
+        }
     }
 
     @Override
     protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
         super.loadAdditional(input, registries);
-        filterSlot.deserializeNBT(registries, input.getCompoundOrEmpty(FILTER_SLOT_KEY));
-        priority = input.getIntOr("priority", PriorityStampItem.DEFAULT);
-        controllerPos = input.read("controller", BlockPos.CODEC).orElse(null);
+        filterSlot.deserializeNBT(registries, input.getCompound(FILTER_SLOT_KEY));
+        priority = input.contains("priority") ? input.getInt("priority") : PriorityStampItem.DEFAULT;
+        Tag controllerTag = input.get("controller");
+        controllerPos = controllerTag == null
+                ? null
+                : BlockPos.CODEC.parse(NbtOps.INSTANCE, controllerTag).result().orElse(null);
     }
 }

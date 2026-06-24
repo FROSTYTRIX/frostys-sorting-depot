@@ -4,6 +4,10 @@
 # Note that there are a couple of TOML lists in this file.
 # Find more information on toml format here:  https://github.com/toml-lang/toml
 
+# 1.21.1 requires an explicit mod loader declaration; 26.x makes this implicit.
+modLoader="javafml" #mandatory
+loaderVersion="[4,)" #mandatory
+
 # The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
 license="${mod_license}"
@@ -44,9 +48,6 @@ A purely mechanical item-sorting network — no power, no pipes of its own. Rout
 Controller into any inventory using Filter Cards (item, tag, or overflow) and Priority Stamps. Works with
 vanilla chests, barrels, shulker boxes, and any mod that exposes the standard NeoForge item capability.
 '''
-
-# The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
-[[mixins]]
 
 # The [[accessTransformers]] block allows you to declare where your AT file is.
 # If this block is omitted, a fallback attempt will be made to load an AT from META-INF/accesstransformer.cfg

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": {"model": "frostyssortingdepot:block/linker_node"},
+    "facing=east":  {"model": "frostyssortingdepot:block/linker_node", "y": 90},
+    "facing=south": {"model": "frostyssortingdepot:block/linker_node", "y": 180},
+    "facing=west":  {"model": "frostyssortingdepot:block/linker_node", "y": 270}
+  }
+}

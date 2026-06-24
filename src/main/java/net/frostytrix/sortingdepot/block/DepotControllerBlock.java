@@ -63,4 +63,13 @@ public class DepotControllerBlock extends Block implements EntityBlock {
         }
         return InteractionResult.SUCCESS;
     }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock())
+                && level.getBlockEntity(pos) instanceof DepotControllerBlockEntity controller) {
+            controller.dropContents(level, pos);
+        }
+        super.onRemove(state, level, pos, newState, isMoving);
+    }
 }

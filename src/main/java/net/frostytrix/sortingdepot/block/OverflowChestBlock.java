@@ -16,7 +16,8 @@ import org.jetbrains.annotations.Nullable;
 public class OverflowChestBlock extends ChestBlock {
 
     public OverflowChestBlock(Properties properties) {
-        super(SDBlockEntities.OVERFLOW_CHEST::get, properties);
+        // 1.21.1 ChestBlock(Properties, Supplier) — arg order is reversed vs 1.21.4+.
+        super(properties, SDBlockEntities.OVERFLOW_CHEST::get);
     }
 
     @Override

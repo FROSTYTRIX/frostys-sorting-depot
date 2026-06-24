@@ -5,38 +5,36 @@ import java.util.concurrent.CompletableFuture;
 import net.frostytrix.sortingdepot.FrostysSortingDepot;
 import net.frostytrix.sortingdepot.registry.SDItems;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Recipe;
 
 /**
- * Generates the mod's crafting recipes. A single {@code filter_card} recipe outputs a blank card; the
- * card's mode and item/tag targets are configured later in the Linker Node GUI, not baked at craft time.
+ * Generates the mod's crafting recipes. 1.21.1's {@link RecipeProvider} ctor takes
+ * {@code (PackOutput, CompletableFuture<HolderLookup.Provider>)} and {@code save} takes a
+ * {@link ResourceLocation} rather than a {@code ResourceKey<Recipe<?>>}. A single {@code filter_card}
+ * recipe outputs a blank card; configuration happens at runtime in the Filter Card GUI.
  */
 public class SDRecipeProvider extends RecipeProvider {
 
-    protected SDRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
-        super(registries, output);
+    public SDRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+        super(output, registries);
     }
 
     @Override
-    protected void buildRecipes() {
-        // Filter Card (Item mode) — plain card, no baked component (defaults to EMPTY = Item mode).
-        shaped(RecipeCategory.MISC, SDItems.FILTER_CARD.get())
+    protected void buildRecipes(RecipeOutput output) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, SDItems.FILTER_CARD.get())
                 .pattern("PN")
                 .define('P', Items.PAPER)
                 .define('N', Items.IRON_NUGGET)
                 .unlockedBy("has_paper", has(Items.PAPER))
                 .save(output, key("filter_card_item"));
 
-        // Priority Stamp — Iron Ingot + Redstone Torch.
-        shaped(RecipeCategory.MISC, SDItems.PRIORITY_STAMP.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, SDItems.PRIORITY_STAMP.get())
                 .pattern("T")
                 .pattern("I")
                 .define('T', Items.REDSTONE_TORCH)
@@ -44,8 +42,7 @@ public class SDRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_redstone_torch", has(Items.REDSTONE_TORCH))
                 .save(output, key("priority_stamp"));
 
-        // Linker Node — Iron + Redstone (cheap; one per destination).
-        shaped(RecipeCategory.MISC, SDItems.LINKER_NODE.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, SDItems.LINKER_NODE.get())
                 .pattern("III")
                 .pattern("IRI")
                 .define('I', Items.IRON_INGOT)
@@ -53,8 +50,7 @@ public class SDRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_redstone", has(Items.REDSTONE))
                 .save(output, key("linker_node"));
 
-        // Depot Controller — Iron Block + Hopper + Comparator (mid-game hub).
-        shaped(RecipeCategory.MISC, SDItems.DEPOT_CONTROLLER.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, SDItems.DEPOT_CONTROLLER.get())
                 .pattern("H")
                 .pattern("B")
                 .pattern("C")
@@ -64,8 +60,7 @@ public class SDRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_comparator", has(Items.COMPARATOR))
                 .save(output, key("depot_controller"));
 
-        // Depot Terminal — Controller + Glass Pane + Redstone (optional QoL).
-        shaped(RecipeCategory.MISC, SDItems.DEPOT_TERMINAL.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, SDItems.DEPOT_TERMINAL.get())
                 .pattern("R")
                 .pattern("G")
                 .pattern("D")
@@ -75,8 +70,7 @@ public class SDRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_depot_controller", has(SDItems.DEPOT_CONTROLLER.get()))
                 .save(output, key("depot_terminal"));
 
-        // Overflow Chest — Chest + Iron Ingot + Hopper.
-        shaped(RecipeCategory.MISC, SDItems.OVERFLOW_CHEST.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, SDItems.OVERFLOW_CHEST.get())
                 .pattern("C")
                 .pattern("I")
                 .pattern("H")
@@ -86,8 +80,7 @@ public class SDRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_hopper", has(Items.HOPPER))
                 .save(output, key("overflow_chest"));
 
-        // Linker — Iron Ingot + Redstone + Stick (cheap, players need many).
-        shaped(RecipeCategory.MISC, SDItems.LINKER.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, SDItems.LINKER.get())
                 .pattern("I")
                 .pattern("R")
                 .pattern("S")
@@ -98,25 +91,7 @@ public class SDRecipeProvider extends RecipeProvider {
                 .save(output, key("linker"));
     }
 
-    private static ResourceKey<Recipe<?>> key(String name) {
-        return ResourceKey.create(Registries.RECIPE, ResourceLocation.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, name));
-    }
-
-    /** Wires the provider into NeoForge's data generation. */
-    public static class Runner extends RecipeProvider.Runner {
-
-        public Runner(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-            super(output, registries);
-        }
-
-        @Override
-        protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
-            return new SDRecipeProvider(registries, output);
-        }
-
-        @Override
-        public String getName() {
-            return "Sorting Depot Recipes";
-        }
+    private static ResourceLocation key(String name) {
+        return ResourceLocation.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, name);
     }
 }

@@ -89,7 +89,7 @@ public class FilterCardMenu extends AbstractContainerMenu {
     public static List<ResourceLocation> availableTags(List<ResourceLocation> items) {
         LinkedHashSet<ResourceLocation> tags = new LinkedHashSet<>();
         for (ResourceLocation id : items) {
-            Item item = BuiltInRegistries.ITEM.getValue(id);
+            Item item = BuiltInRegistries.ITEM.get(id);
             if (item == Items.AIR) {
                 continue;
             }

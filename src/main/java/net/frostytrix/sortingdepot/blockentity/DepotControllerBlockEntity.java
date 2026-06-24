@@ -20,6 +20,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
@@ -213,11 +215,14 @@ public class DepotControllerBlockEntity extends BlockEntity {
 
     // --- persistence ---------------------------------------------------------------------------
 
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
+    /**
+     * Drops the buffered item at {@code pos}. The Controller's block calls this from {@code onRemove}
+     * (1.21.1 has no {@code preRemoveSideEffects} on {@code BlockEntity}, so the equivalent hook lives on
+     * the block).
+     */
+    public void dropContents(net.minecraft.world.level.Level level, BlockPos pos) {
         ItemStack buffered = input.getStackInSlot(0);
-        if (level != null && !buffered.isEmpty()) {
+        if (!buffered.isEmpty()) {
             Block.popResource(level, pos, buffered);
         }
     }
@@ -226,14 +231,17 @@ public class DepotControllerBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
         super.saveAdditional(output, registries);
         output.put(INPUT_KEY, input.serializeNBT(registries));
-        output.store("linkers", BlockPos.CODEC.listOf(), linkers);
+        output.put("linkers", BlockPos.CODEC.listOf().encodeStart(NbtOps.INSTANCE, linkers).getOrThrow());
     }
 
     @Override
     protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
         super.loadAdditional(input, registries);
-        this.input.deserializeNBT(registries, input.getCompoundOrEmpty(INPUT_KEY));
+        this.input.deserializeNBT(registries, input.getCompound(INPUT_KEY));
         linkers.clear();
-        linkers.addAll(input.read("linkers", BlockPos.CODEC.listOf()).orElse(List.of()));
+        Tag linkersTag = input.get("linkers");
+        if (linkersTag != null) {
+            BlockPos.CODEC.listOf().parse(NbtOps.INSTANCE, linkersTag).result().ifPresent(linkers::addAll);
+        }
     }
 }

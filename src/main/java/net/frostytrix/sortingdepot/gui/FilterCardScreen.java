@@ -101,7 +101,7 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
                 int gx = x + GHOST_X + i * SLOT;
                 drawSlot(graphics, gx, y + GHOST_Y);
                 if (i < items.size()) {
-                    ItemStack icon = new ItemStack(BuiltInRegistries.ITEM.getValue(items.get(i)));
+                    ItemStack icon = new ItemStack(BuiltInRegistries.ITEM.get(items.get(i)));
                     graphics.renderItem(icon, gx + 1, y + GHOST_Y + 1);
                 }
             }
