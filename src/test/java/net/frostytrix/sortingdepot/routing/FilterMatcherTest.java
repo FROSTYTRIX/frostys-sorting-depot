@@ -30,30 +30,26 @@ class FilterMatcherTest {
         }
 
         @Test
-        void lenientIgnoresComponents() {
+        void matchesIgnoringComponents() {
             var enchanted = new RoutableItem("minecraft:diamond_sword", 1, Set.of(), "{sharpness:5}");
             assertTrue(FilterMatcher.matches(enchanted, FilterMode.ItemFilter.lenient("minecraft:diamond_sword")));
         }
 
         @Test
-        void strictMatchesWhenComponentsEqual() {
-            var item = new RoutableItem("minecraft:diamond_sword", 1, Set.of(), "{sharpness:5}");
-            var filter = new FilterMode.ItemFilter("minecraft:diamond_sword", "{sharpness:5}", true);
-            assertTrue(FilterMatcher.matches(item, filter));
+        void matchesWhenIdIsOneOfSeveral() {
+            var filter = new FilterMode.ItemFilter(Set.of("minecraft:oak_log", "minecraft:birch_log"));
+            assertTrue(FilterMatcher.matches(oakLog(), filter));
         }
 
         @Test
-        void strictRejectsWhenComponentsDiffer() {
-            var item = new RoutableItem("minecraft:diamond_sword", 1, Set.of(), "{sharpness:1}");
-            var filter = new FilterMode.ItemFilter("minecraft:diamond_sword", "{sharpness:5}", true);
-            assertFalse(FilterMatcher.matches(item, filter));
+        void rejectsWhenIdNotInSet() {
+            var filter = new FilterMode.ItemFilter(Set.of("minecraft:birch_log", "minecraft:spruce_log"));
+            assertFalse(FilterMatcher.matches(oakLog(), filter));
         }
 
         @Test
-        void strictMatchesWhenBothComponentsNull() {
-            var item = new RoutableItem("minecraft:stick", 1, Set.of(), null);
-            var filter = new FilterMode.ItemFilter("minecraft:stick", null, true);
-            assertTrue(FilterMatcher.matches(item, filter));
+        void emptySetMatchesNothing() {
+            assertFalse(FilterMatcher.matches(oakLog(), new FilterMode.ItemFilter(Set.of())));
         }
     }
 

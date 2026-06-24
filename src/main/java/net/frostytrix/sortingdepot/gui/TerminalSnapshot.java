@@ -2,6 +2,7 @@ package net.frostytrix.sortingdepot.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import net.frostytrix.sortingdepot.block.LinkerNodeBlock;
 import net.frostytrix.sortingdepot.blockentity.DepotControllerBlockEntity;
@@ -70,8 +71,12 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
         }
         FilterCardData data = FilterCardItem.data(card);
         return switch (data.mode()) {
-            case ITEM -> "Item: " + data.itemId().map(Identifier::toString).orElse("-");
-            case TAG -> "Tag: " + data.tags().stream().findFirst().map(id -> "#" + id).orElse("-");
+            case ITEM -> data.items().isEmpty()
+                    ? "Items: -"
+                    : "Items: " + data.items().stream().map(Identifier::getPath).collect(Collectors.joining(", "));
+            case TAG -> data.tags().isEmpty()
+                    ? "Tags: -"
+                    : data.tags().stream().map(id -> "#" + id.getPath()).collect(Collectors.joining(", "));
             case OVERFLOW -> "Overflow";
         };
     }

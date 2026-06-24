@@ -26,8 +26,9 @@ public final class SDItems {
     public static final DeferredRegister<CreativeModeTab> TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, FrostysSortingDepot.MOD_ID);
 
+    // Stacks to 1: each card carries its own filter configuration, so they must stay individually editable.
     public static final DeferredItem<FilterCardItem> FILTER_CARD =
-            ITEMS.registerItem("filter_card", FilterCardItem::new);
+            ITEMS.registerItem("filter_card", FilterCardItem::new, props -> props.stacksTo(1));
     public static final DeferredItem<PriorityStampItem> PRIORITY_STAMP =
             ITEMS.registerItem("priority_stamp", PriorityStampItem::new);
     public static final DeferredItem<LinkerItem> LINKER =

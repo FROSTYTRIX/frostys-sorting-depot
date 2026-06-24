@@ -6,9 +6,10 @@
   "item.frostyssortingdepot.filter_card.mode.item": "Item",
   "item.frostyssortingdepot.filter_card.mode.tag": "Tag",
   "item.frostyssortingdepot.filter_card.mode.overflow": "Overflow",
-  "item.frostyssortingdepot.filter_card.target": "Target: %s",
-  "item.frostyssortingdepot.filter_card.tags": "Tag: %s",
+  "item.frostyssortingdepot.filter_card.items": "Items: %s/%s",
+  "item.frostyssortingdepot.filter_card.tags": "Tags: %s/%s",
   "item.frostyssortingdepot.filter_card.overflow": "Accepts anything",
+  "item.frostyssortingdepot.filter_card.hint": "Right-click to configure",
 
   "item.frostyssortingdepot.priority_stamp": "Priority Stamp",
   "item.frostyssortingdepot.priority_stamp.value": "Priority: %s",
@@ -29,6 +30,11 @@
 
   "gui.frostyssortingdepot.linker_node.linked": "Linked to Controller",
   "gui.frostyssortingdepot.linker_node.unlinked": "Not linked",
+
+  "gui.frostyssortingdepot.filter_card.add_items": "Click items to add  %s/%s",
+  "gui.frostyssortingdepot.filter_card.tags": "Tags  %s/%s",
+  "gui.frostyssortingdepot.filter_card.no_tags": "Add items first",
+  "gui.frostyssortingdepot.filter_card.overflow": "Matches anything",
 
   "gui.frostyssortingdepot.terminal.empty": "No Linker Nodes registered",
   "gui.frostyssortingdepot.terminal.overflow": "Overflow: %s",

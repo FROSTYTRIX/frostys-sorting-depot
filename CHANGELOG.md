@@ -2,6 +2,19 @@
 
 All notable changes to Frosty's Sorting Depot are documented here.
 
+## 1.0.1 — 2026-06-24
+
+### Changed
+- **Filter Cards are now configured in a dedicated GUI.** Right-click a Filter Card to open its
+  configuration screen. The old "right-click the card onto an item" interaction is gone.
+- **One card can now match up to 5 items _or_ up to 3 tags.** In the screen, click items in your
+  inventory to add them (up to five), switch to **Tag** mode to tick up to three of those items' tags
+  from a scrolling checklist, or pick **Overflow** to accept everything.
+- **Filter Cards now stack to 1**, since each carries its own configuration.
+
+### Removed
+- The one-tag-at-a-time limitation on tag filters.
+
 ## 1.0.0 — 2026-06-23
 
 First release: a complete, purely mechanical sorting network.

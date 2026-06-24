@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import net.frostytrix.sortingdepot.FrostysSortingDepot;
 import net.frostytrix.sortingdepot.gui.DepotControllerMenu;
 import net.frostytrix.sortingdepot.gui.DepotTerminalMenu;
+import net.frostytrix.sortingdepot.gui.FilterCardMenu;
 import net.frostytrix.sortingdepot.gui.LinkerNodeMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
@@ -25,6 +26,9 @@ public final class SDMenus {
 
     public static final Supplier<MenuType<LinkerNodeMenu>> LINKER_NODE =
             MENUS.register("linker_node", () -> IMenuTypeExtension.create(LinkerNodeMenu::new));
+
+    public static final Supplier<MenuType<FilterCardMenu>> FILTER_CARD =
+            MENUS.register("filter_card", () -> IMenuTypeExtension.create(FilterCardMenu::new));
 
     public static final Supplier<MenuType<DepotControllerMenu>> DEPOT_CONTROLLER =
             MENUS.register("depot_controller", () -> IMenuTypeExtension.create(DepotControllerMenu::new));

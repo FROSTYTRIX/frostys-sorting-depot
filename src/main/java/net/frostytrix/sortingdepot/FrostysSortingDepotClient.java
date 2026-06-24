@@ -3,6 +3,7 @@ package net.frostytrix.sortingdepot;
 import net.frostytrix.sortingdepot.client.OverflowChestRenderer;
 import net.frostytrix.sortingdepot.gui.DepotControllerScreen;
 import net.frostytrix.sortingdepot.gui.DepotTerminalScreen;
+import net.frostytrix.sortingdepot.gui.FilterCardScreen;
 import net.frostytrix.sortingdepot.gui.LinkerNodeScreen;
 import net.frostytrix.sortingdepot.registry.SDBlockEntities;
 import net.frostytrix.sortingdepot.registry.SDMenus;
@@ -24,6 +25,7 @@ public class FrostysSortingDepotClient {
     static void registerScreens(RegisterMenuScreensEvent event) {
         // The Overflow Chest now uses the vanilla chest screen (no custom screen needed).
         event.register(SDMenus.LINKER_NODE.get(), LinkerNodeScreen::new);
+        event.register(SDMenus.FILTER_CARD.get(), FilterCardScreen::new);
         event.register(SDMenus.DEPOT_CONTROLLER.get(), DepotControllerScreen::new);
         event.register(SDMenus.DEPOT_TERMINAL.get(), DepotTerminalScreen::new);
     }

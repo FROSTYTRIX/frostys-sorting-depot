@@ -1,7 +1,5 @@
 package net.frostytrix.sortingdepot.routing;
 
-import java.util.Objects;
-
 /**
  * Pure matching logic: does a given item satisfy a given filter?
  *
@@ -25,12 +23,8 @@ public final class FilterMatcher {
     }
 
     private static boolean matchesItem(RoutableItem item, FilterMode.ItemFilter filter) {
-        if (!item.itemId().equals(filter.itemId())) {
-            return false;
-        }
-        // In strict mode the component snapshots must be identical too (e.g. an enchanted book
-        // with specific enchantments vs. a plain one).
-        return !filter.strict() || Objects.equals(item.componentSnapshot(), filter.componentSnapshot());
+        // Accept if the item's id is any of the ids the card lists (matching on id alone).
+        return filter.itemIds().contains(item.itemId());
     }
 
     private static boolean matchesTag(RoutableItem item, FilterMode.TagFilter filter) {

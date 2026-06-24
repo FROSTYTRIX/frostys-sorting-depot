@@ -12,23 +12,20 @@ public sealed interface FilterMode
         permits FilterMode.ItemFilter, FilterMode.TagFilter, FilterMode.OverflowFilter {
 
     /**
-     * Exact item match.
+     * Exact item match against a small set of registry ids. The card accepts an item if its id is one of
+     * {@code itemIds}. Components are ignored (an item matches on id alone) — this keeps multi-item cards
+     * simple, which is the only way item cards are configured from the GUI.
      *
-     * @param itemId            registry id this card accepts
-     * @param componentSnapshot reference component snapshot to compare against when {@code strict};
-     *                          may be {@code null}
-     * @param strict            when {@code true}, the item's {@code componentSnapshot} must also match
+     * @param itemIds registry ids this card accepts, e.g. {@code "minecraft:oak_log"} (up to 5 in practice)
      */
-    record ItemFilter(String itemId, String componentSnapshot, boolean strict) implements FilterMode {
+    record ItemFilter(Set<String> itemIds) implements FilterMode {
         public ItemFilter {
-            if (itemId == null) {
-                throw new IllegalArgumentException("itemId must not be null");
-            }
+            itemIds = (itemIds == null) ? Set.of() : Set.copyOf(itemIds);
         }
 
-        /** Lenient item filter: matches on id alone, ignoring components. */
+        /** Single-id item filter. */
         public static ItemFilter lenient(String itemId) {
-            return new ItemFilter(itemId, null, false);
+            return new ItemFilter(Set.of(itemId));
         }
     }
 

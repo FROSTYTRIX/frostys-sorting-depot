@@ -1,15 +1,10 @@
 package net.frostytrix.sortingdepot.datagen;
 
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import net.frostytrix.sortingdepot.FrostysSortingDepot;
-import net.frostytrix.sortingdepot.item.component.FilterCardData;
-import net.frostytrix.sortingdepot.registry.SDDataComponents;
 import net.frostytrix.sortingdepot.registry.SDItems;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -22,9 +17,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
 
 /**
- * Generates the mod's crafting recipes. The three Filter Card recipes all output the same
- * {@code filter_card} item but bake a different {@link FilterCardData} into the result via an
- * {@link ItemStackTemplate}, so each crafts a card pre-set to Item / Tag / Overflow mode.
+ * Generates the mod's crafting recipes. A single {@code filter_card} recipe outputs a blank card; the
+ * card's mode and item/tag targets are configured later in the Linker Node GUI, not baked at craft time.
  */
 public class SDRecipeProvider extends RecipeProvider {
 
@@ -41,21 +35,6 @@ public class SDRecipeProvider extends RecipeProvider {
                 .define('N', Items.IRON_NUGGET)
                 .unlockedBy("has_paper", has(Items.PAPER))
                 .save(output, key("filter_card_item"));
-
-        // Filter Card (Tag mode) — Paper + Gold Nugget.
-        shaped(RecipeCategory.MISC, card(FilterCardData.Mode.TAG))
-                .pattern("PN")
-                .define('P', Items.PAPER)
-                .define('N', Items.GOLD_NUGGET)
-                .unlockedBy("has_gold_nugget", has(Items.GOLD_NUGGET))
-                .save(output, key("filter_card_tag"));
-
-        // Filter Card (Overflow mode) — Paper only.
-        shaped(RecipeCategory.MISC, card(FilterCardData.Mode.OVERFLOW))
-                .pattern("P")
-                .define('P', Items.PAPER)
-                .unlockedBy("has_paper", has(Items.PAPER))
-                .save(output, key("filter_card_overflow"));
 
         // Priority Stamp — Iron Ingot + Redstone Torch.
         shaped(RecipeCategory.MISC, new ItemStackTemplate(SDItems.PRIORITY_STAMP.get()))
@@ -118,15 +97,6 @@ public class SDRecipeProvider extends RecipeProvider {
                 .define('S', Items.STICK)
                 .unlockedBy("has_redstone", has(Items.REDSTONE))
                 .save(output, key("linker"));
-    }
-
-    /** A filter_card result template pre-configured to the given mode. */
-    private static ItemStackTemplate card(FilterCardData.Mode mode) {
-        FilterCardData data = new FilterCardData(mode, Optional.empty(), Set.of(), false);
-        DataComponentPatch patch = DataComponentPatch.builder()
-                .set(SDDataComponents.FILTER_DATA.get(), data)
-                .build();
-        return new ItemStackTemplate(SDItems.FILTER_CARD.get(), patch);
     }
 
     private static ResourceKey<Recipe<?>> key(String name) {

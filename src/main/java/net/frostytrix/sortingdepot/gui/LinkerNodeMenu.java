@@ -39,7 +39,7 @@ public class LinkerNodeMenu extends AbstractContainerMenu {
         this.access = ContainerLevelAccess.create(node.getLevel(), node.getBlockPos());
 
         // Filter Card slot (the handler's isValid restricts it to Filter Cards).
-        addSlot(new ResourceHandlerSlot(node.getFilterSlot(), node.getFilterSlot()::set, 0, 80, 35));
+        addSlot(new ResourceHandlerSlot(node.getFilterSlot(), node.getFilterSlot()::set, 0, 80, 47));
 
         // Sync the node's priority to the client so the screen can display it.
         addDataSlot(new DataSlot() {

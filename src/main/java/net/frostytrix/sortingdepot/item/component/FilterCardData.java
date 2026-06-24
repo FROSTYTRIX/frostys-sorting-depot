@@ -1,7 +1,8 @@
 package net.frostytrix.sortingdepot.item.component;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,15 +22,24 @@ import net.minecraft.util.StringRepresentable;
  * {@link FilterMode}: it holds {@link Identifier}s and serializes with Minecraft codecs, then
  * {@linkplain #toFilterMode() converts} to the Minecraft-free routing type at the adapter boundary.
  *
- * @param mode   which matching strategy this card uses
- * @param itemId target item for {@link Mode#ITEM}, empty when unconfigured
- * @param tags   tag keys for {@link Mode#TAG}
- * @param strict whether {@link Mode#ITEM} also compares data components
+ * <p>A card holds <strong>up to {@value #MAX_ITEMS} items</strong> and <strong>up to {@value #MAX_TAGS}
+ * tags</strong>. The active {@link Mode} decides which set is consulted when routing: {@code ITEM} uses
+ * {@link #items}, {@code TAG} uses {@link #tags}, {@code OVERFLOW} matches everything. Both lists are
+ * retained across mode switches so the GUI can populate the tag checklist from the chosen items.
+ *
+ * @param mode  which matching strategy this card uses
+ * @param items target item ids for {@link Mode#ITEM}
+ * @param tags  tag keys for {@link Mode#TAG}
  */
-public record FilterCardData(Mode mode, Optional<Identifier> itemId, Set<Identifier> tags, boolean strict) {
+public record FilterCardData(Mode mode, List<Identifier> items, Set<Identifier> tags) {
+
+    /** Maximum number of exact items a single card can list. */
+    public static final int MAX_ITEMS = 5;
+    /** Maximum number of tags a single card can list. */
+    public static final int MAX_TAGS = 3;
 
     public FilterCardData {
-        itemId = (itemId == null) ? Optional.empty() : itemId;
+        items = (items == null) ? List.of() : List.copyOf(items);
         tags = (tags == null) ? Set.of() : Set.copyOf(tags);
     }
 
@@ -51,16 +61,15 @@ public record FilterCardData(Mode mode, Optional<Identifier> itemId, Set<Identif
         }
     }
 
-    /** Freshly-crafted, unconfigured card: Item mode with no target. */
-    public static final FilterCardData EMPTY = new FilterCardData(Mode.ITEM, Optional.empty(), Set.of(), false);
+    /** Freshly-crafted, unconfigured card: Item mode with no targets. */
+    public static final FilterCardData EMPTY = new FilterCardData(Mode.ITEM, List.of(), Set.of());
 
     public static final Codec<FilterCardData> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             StringRepresentable.fromEnum(Mode::values).fieldOf("mode").forGetter(FilterCardData::mode),
-            Identifier.CODEC.optionalFieldOf("item_id").forGetter(FilterCardData::itemId),
+            Identifier.CODEC.listOf().optionalFieldOf("items", List.of()).forGetter(FilterCardData::items),
             Identifier.CODEC.listOf().optionalFieldOf("tags", List.of())
-                    .xmap(list -> (Set<Identifier>) Set.copyOf(list), set -> List.copyOf(set))
-                    .forGetter(FilterCardData::tags),
-            Codec.BOOL.optionalFieldOf("strict", false).forGetter(FilterCardData::strict)
+                    .xmap(list -> (Set<Identifier>) new LinkedHashSet<>(list), List::copyOf)
+                    .forGetter(FilterCardData::tags)
     ).apply(inst, FilterCardData::new));
 
     /** Derived from {@link #CODEC} via NBT — avoids hand-writing a composite stream codec. */
@@ -69,26 +78,53 @@ public record FilterCardData(Mode mode, Optional<Identifier> itemId, Set<Identif
     /** Convert to the pure routing representation. Identifiers become plain strings. */
     public FilterMode toFilterMode() {
         return switch (mode) {
-            // An unconfigured Item card (no target) yields a filter that matches nothing.
-            case ITEM -> new FilterMode.ItemFilter(itemId.map(Identifier::toString).orElse(""), null, strict);
+            case ITEM -> new FilterMode.ItemFilter(items.stream().map(Identifier::toString).collect(Collectors.toSet()));
             case TAG -> new FilterMode.TagFilter(tags.stream().map(Identifier::toString).collect(Collectors.toSet()));
             case OVERFLOW -> new FilterMode.OverflowFilter();
         };
     }
 
-    /** Returns the next mode in the cycle ITEM → TAG → OVERFLOW → ITEM. */
-    public Mode nextMode() {
-        Mode[] values = Mode.values();
-        return values[(mode.ordinal() + 1) % values.length];
-    }
-
-    /** A copy with the mode replaced (payload retained so a later cycle back doesn't lose it). */
+    /** A copy with the mode replaced; the item/tag lists are kept so switching back loses nothing. */
     public FilterCardData withMode(Mode newMode) {
-        return new FilterCardData(newMode, itemId, tags, strict);
+        return new FilterCardData(newMode, items, tags);
     }
 
-    /** A configured Item-mode card targeting the given item id. */
-    public static FilterCardData ofItem(Identifier id, boolean strict) {
-        return new FilterCardData(Mode.ITEM, Optional.of(id), Set.of(), strict);
+    /**
+     * Adds {@code id} to the item list. No-op (returns {@code this}) if it is already present or the list
+     * is already at {@link #MAX_ITEMS}.
+     */
+    public FilterCardData withItemAdded(Identifier id) {
+        if (items.contains(id) || items.size() >= MAX_ITEMS) {
+            return this;
+        }
+        List<Identifier> next = new ArrayList<>(items);
+        next.add(id);
+        return new FilterCardData(mode, next, tags);
+    }
+
+    /** Removes the item at {@code index}, or returns {@code this} if the index is out of range. */
+    public FilterCardData withItemRemovedAt(int index) {
+        if (index < 0 || index >= items.size()) {
+            return this;
+        }
+        List<Identifier> next = new ArrayList<>(items);
+        next.remove(index);
+        return new FilterCardData(mode, next, tags);
+    }
+
+    /**
+     * Toggles tag {@code id}: removes it if present, otherwise adds it (no-op when already at
+     * {@link #MAX_TAGS}). Insertion order is preserved so the GUI checklist stays stable.
+     */
+    public FilterCardData withTagToggled(Identifier id) {
+        LinkedHashSet<Identifier> next = new LinkedHashSet<>(tags);
+        if (next.contains(id)) {
+            next.remove(id);
+        } else if (next.size() < MAX_TAGS) {
+            next.add(id);
+        } else {
+            return this;
+        }
+        return new FilterCardData(mode, items, next);
     }
 }
