@@ -56,6 +56,7 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
         graphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, TEXT_COLOR, false);
 
         List<TerminalSnapshot.Entry> linkers = this.menu.getSnapshot().linkers();
+        int rowWidth = this.imageWidth - 16; // 8px padding on each side
         if (linkers.isEmpty()) {
             graphics.drawString(this.font, Component.translatable("gui.frostyssortingdepot.terminal.empty"),
                     8, LIST_TOP, TEXT_COLOR, false);
@@ -65,9 +66,8 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
             int y = LIST_TOP;
             for (int i = scrollOffset; i < end; i++) {
                 TerminalSnapshot.Entry entry = linkers.get(i);
-                graphics.drawString(this.font,
-                        Component.literal(entry.target() + "  ·  " + entry.filter() + "  ·  " + entry.fill() + "%"),
-                        8, y, TEXT_COLOR, false);
+                String full = entry.target() + "  ·  " + entry.filter() + "  ·  " + entry.fill() + "%";
+                drawRow(graphics, full, y, rowWidth, mouseX, mouseY);
                 y += ROW_HEIGHT;
             }
             // Scroll affordances, both arrows together at the bottom of the list.
@@ -94,5 +94,29 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
                 this.menu.getSnapshot().inputCount());
         graphics.drawString(this.font, overflow, 8, this.imageHeight - 32, TEXT_COLOR, false);
         graphics.drawString(this.font, buffer, 8, this.imageHeight - 22, TEXT_COLOR, false);
+    }
+
+    /**
+     * Draws a row of terminal text, ellipsized to fit {@code rowWidth}; if the row was truncated and the
+     * mouse hovers over it, the full text is shown as a tooltip. {@code mouseX}/{@code mouseY} are
+     * GUI-local in renderLabels; the tooltip API wants screen-space, so {@link #leftPos}/{@link #topPos}
+     * are added back.
+     */
+    private void drawRow(GuiGraphics graphics, String full, int y, int rowWidth, int mouseX, int mouseY) {
+        String shown = fitWidth(full, rowWidth);
+        graphics.drawString(this.font, Component.literal(shown), 8, y, TEXT_COLOR, false);
+        if (!shown.equals(full)
+                && mouseX >= 8 && mouseX < 8 + rowWidth
+                && mouseY >= y && mouseY < y + ROW_HEIGHT - 1) {
+            graphics.renderTooltip(this.font, Component.literal(full), mouseX + this.leftPos, mouseY + this.topPos);
+        }
+    }
+
+    /** Truncates {@code s} with an ellipsis so it fits within {@code maxWidth} pixels. */
+    private String fitWidth(String s, int maxWidth) {
+        if (this.font.width(s) <= maxWidth) {
+            return s;
+        }
+        return this.font.plainSubstrByWidth(s, maxWidth - this.font.width("…")) + "…";
     }
 }
