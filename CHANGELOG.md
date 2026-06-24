@@ -2,6 +2,12 @@
 
 All notable changes to Frosty's Sorting Depot are documented here.
 
+## 1.0.2 — 2026-06-24
+
+### Fixed
+- **Depot Terminal no longer overflows its panel.** Long rows (long block names, or filters with many
+  items/tags) now wrap onto extra lines instead of running off the edge, with the fill % kept at the end.
+
 ## 1.0.1 — 2026-06-24
 
 ### Changed
