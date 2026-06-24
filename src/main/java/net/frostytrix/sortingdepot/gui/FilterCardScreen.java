@@ -147,7 +147,7 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
             String shown = fitWidth(full, maxTextWidth);
             graphics.drawString(font, Component.literal(shown), x + TAG_TEXT_X, ry + 1, TEXT, false);
             if (!shown.equals(full) && inRect(mouseX - x, mouseY - y, 10, TAG_Y + r * TAG_ROW_H, imageWidth - 20, 10)) {
-                graphics.setTooltipForNextFrame(font, Component.literal(full), mouseX, mouseY);
+                graphics.renderTooltip(font, Component.literal(full), mouseX, mouseY);
             }
         }
     }

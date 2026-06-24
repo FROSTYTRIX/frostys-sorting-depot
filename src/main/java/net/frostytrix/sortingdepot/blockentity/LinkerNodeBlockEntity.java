@@ -11,8 +11,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -107,17 +107,17 @@ public class LinkerNodeBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        filterSlot.serialize(output.child(FILTER_SLOT_KEY));
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
+        output.put(FILTER_SLOT_KEY, filterSlot.serializeNBT(registries));
         output.putInt("priority", priority);
         output.storeNullable("controller", BlockPos.CODEC, controllerPos);
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        input.child(FILTER_SLOT_KEY).ifPresent(filterSlot::deserialize);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        filterSlot.deserializeNBT(registries, input.getCompoundOrEmpty(FILTER_SLOT_KEY));
         priority = input.getIntOr("priority", PriorityStampItem.DEFAULT);
         controllerPos = input.read("controller", BlockPos.CODEC).orElse(null);
     }
