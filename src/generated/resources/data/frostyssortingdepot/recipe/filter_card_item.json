@@ -1,5 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "key": {
     "N": "minecraft:iron_nugget",
     "P": "minecraft:paper"
@@ -8,6 +9,7 @@
     "PN"
   ],
   "result": {
+    "count": 1,
     "id": "frostyssortingdepot:filter_card"
   }
 }

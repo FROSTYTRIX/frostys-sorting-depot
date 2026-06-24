@@ -1,5 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "key": {
     "B": "minecraft:iron_block",
     "C": "minecraft:comparator",
@@ -11,6 +12,7 @@
     "C"
   ],
   "result": {
+    "count": 1,
     "id": "frostyssortingdepot:depot_controller"
   }
 }

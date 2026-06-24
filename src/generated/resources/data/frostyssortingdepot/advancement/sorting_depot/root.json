@@ -17,6 +17,7 @@
       "translate": "advancements.frostyssortingdepot.root.description"
     },
     "icon": {
+      "count": 1,
       "id": "frostyssortingdepot:depot_controller"
     },
     "title": {

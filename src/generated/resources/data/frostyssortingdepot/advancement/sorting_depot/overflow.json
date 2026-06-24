@@ -17,6 +17,7 @@
       "translate": "advancements.frostyssortingdepot.overflow.description"
     },
     "icon": {
+      "count": 1,
       "id": "frostyssortingdepot:overflow_chest"
     },
     "title": {

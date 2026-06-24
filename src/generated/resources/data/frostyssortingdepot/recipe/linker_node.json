@@ -1,5 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "key": {
     "I": "minecraft:iron_ingot",
     "R": "minecraft:redstone"
@@ -9,6 +10,7 @@
     "IRI"
   ],
   "result": {
+    "count": 1,
     "id": "frostyssortingdepot:linker_node"
   }
 }

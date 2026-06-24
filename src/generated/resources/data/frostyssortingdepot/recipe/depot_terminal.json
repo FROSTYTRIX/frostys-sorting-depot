@@ -1,5 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "key": {
     "D": "frostyssortingdepot:depot_controller",
     "G": "minecraft:glass_pane",
@@ -11,6 +12,7 @@
     "D"
   ],
   "result": {
+    "count": 1,
     "id": "frostyssortingdepot:depot_terminal"
   }
 }
