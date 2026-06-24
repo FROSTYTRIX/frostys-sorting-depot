@@ -13,7 +13,7 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
+import net.neoforged.neoforge.items.SlotItemHandler;
 
 /**
  * Menu for the Linker Node: a single Filter Card slot plus the player inventory.
@@ -39,7 +39,7 @@ public class LinkerNodeMenu extends AbstractContainerMenu {
         this.access = ContainerLevelAccess.create(node.getLevel(), node.getBlockPos());
 
         // Filter Card slot (the handler's isValid restricts it to Filter Cards).
-        addSlot(new ResourceHandlerSlot(node.getFilterSlot(), node.getFilterSlot()::set, 0, 80, 47));
+        addSlot(new SlotItemHandler(node.getFilterSlot(), 0, 80, 47));
 
         // Sync the node's priority to the client so the screen can display it.
         addDataSlot(new DataSlot() {

@@ -7,13 +7,12 @@ import net.frostytrix.sortingdepot.registry.SDItems;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementType;
-import net.minecraft.advancements.triggers.InventoryChangeTrigger;
+import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.advancements.AdvancementSubProvider;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStackTemplate;
 
 /**
  * The "Sorting Depot" advancement tree: craft the Controller (root), then a Filter Card, a Linker, an
@@ -26,10 +25,10 @@ public class SDAdvancements implements AdvancementSubProvider {
     @Override
     public void generate(HolderLookup.Provider registries, Consumer<AdvancementHolder> saver) {
         AdvancementHolder root = Advancement.Builder.advancement()
-                .display(new ItemStackTemplate(SDItems.DEPOT_CONTROLLER.get()),
+                .display(SDItems.DEPOT_CONTROLLER.get(),
                         Component.translatable(PREFIX + "root.title"),
                         Component.translatable(PREFIX + "root.description"),
-                        Identifier.withDefaultNamespace("textures/gui/advancements/backgrounds/stone.png"),
+                        ResourceLocation.withDefaultNamespace("textures/gui/advancements/backgrounds/stone.png"),
                         AdvancementType.TASK, true, true, false)
                 .addCriterion("has_controller",
                         InventoryChangeTrigger.TriggerInstance.hasItems(SDItems.DEPOT_CONTROLLER.get()))
@@ -45,7 +44,7 @@ public class SDAdvancements implements AdvancementSubProvider {
                               String key, AdvancementType type) {
         Advancement.Builder.advancement()
                 .parent(parent)
-                .display(new ItemStackTemplate(icon),
+                .display(icon,
                         Component.translatable(PREFIX + key + ".title"),
                         Component.translatable(PREFIX + key + ".description"),
                         null, type, true, true, false)

@@ -13,13 +13,11 @@ import net.frostytrix.sortingdepot.item.component.FilterCardData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.item.ItemUtil;
-import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -51,8 +49,8 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
                         fillPercent(node.getTargetHandler())));
             }
         }
-        ResourceHandler<ItemResource> overflow = adjacentOverflow(level, controller.getBlockPos());
-        int inputCount = ItemUtil.getStack(controller.getInputHandler(), 0).getCount();
+        IItemHandler overflow = adjacentOverflow(level, controller.getBlockPos());
+        int inputCount = controller.getInputHandler().getStackInSlot(0).getCount();
         return new TerminalSnapshot(entries, overflow != null, fillPercent(overflow), inputCount);
     }
 
@@ -73,7 +71,7 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
         return switch (data.mode()) {
             case ITEM -> data.items().isEmpty()
                     ? "Items: -"
-                    : "Items: " + data.items().stream().map(Identifier::getPath).collect(Collectors.joining(", "));
+                    : "Items: " + data.items().stream().map(ResourceLocation::getPath).collect(Collectors.joining(", "));
             case TAG -> data.tags().isEmpty()
                     ? "Tags: -"
                     : data.tags().stream().map(id -> "#" + id.getPath()).collect(Collectors.joining(", "));
@@ -81,23 +79,23 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
         };
     }
 
-    private static int fillPercent(@Nullable ResourceHandler<ItemResource> handler) {
-        if (handler == null || handler.size() == 0) {
+    private static int fillPercent(@Nullable IItemHandler handler) {
+        if (handler == null || handler.getSlots() == 0) {
             return 0;
         }
         int used = 0;
-        for (int slot = 0; slot < handler.size(); slot++) {
-            if (!ItemUtil.getStack(handler, slot).isEmpty()) {
+        for (int slot = 0; slot < handler.getSlots(); slot++) {
+            if (!handler.getStackInSlot(slot).isEmpty()) {
                 used++;
             }
         }
-        return used * 100 / handler.size();
+        return used * 100 / handler.getSlots();
     }
 
-    private static @Nullable ResourceHandler<ItemResource> adjacentOverflow(Level level, BlockPos controllerPos) {
+    private static @Nullable IItemHandler adjacentOverflow(Level level, BlockPos controllerPos) {
         for (Direction direction : Direction.values()) {
             if (level.getBlockEntity(controllerPos.relative(direction)) instanceof OverflowChestBlockEntity overflow) {
-                return VanillaContainerWrapper.of(overflow);
+                return new InvWrapper(overflow);
             }
         }
         return null;

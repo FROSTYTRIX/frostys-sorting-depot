@@ -48,7 +48,7 @@ public class DepotControllerBlock extends Block implements EntityBlock {
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         return level.getBlockEntity(pos) instanceof DepotControllerBlockEntity controller
                 ? controller.getComparatorSignal()
                 : 0;

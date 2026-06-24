@@ -3,7 +3,6 @@ package net.frostytrix.sortingdepot.block;
 import net.frostytrix.sortingdepot.blockentity.OverflowChestBlockEntity;
 import net.frostytrix.sortingdepot.registry.SDBlockEntities;
 import net.minecraft.core.BlockPos;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public class OverflowChestBlock extends ChestBlock {
 
     public OverflowChestBlock(Properties properties) {
-        super(SDBlockEntities.OVERFLOW_CHEST::get, SoundEvents.CHEST_OPEN, SoundEvents.CHEST_CLOSE, properties);
+        super(SDBlockEntities.OVERFLOW_CHEST::get, properties);
     }
 
     @Override

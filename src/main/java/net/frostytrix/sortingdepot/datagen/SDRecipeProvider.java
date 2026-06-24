@@ -10,9 +10,8 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
 
@@ -29,7 +28,7 @@ public class SDRecipeProvider extends RecipeProvider {
     @Override
     protected void buildRecipes() {
         // Filter Card (Item mode) — plain card, no baked component (defaults to EMPTY = Item mode).
-        shaped(RecipeCategory.MISC, new ItemStackTemplate(SDItems.FILTER_CARD.get()))
+        shaped(RecipeCategory.MISC, SDItems.FILTER_CARD.get())
                 .pattern("PN")
                 .define('P', Items.PAPER)
                 .define('N', Items.IRON_NUGGET)
@@ -37,7 +36,7 @@ public class SDRecipeProvider extends RecipeProvider {
                 .save(output, key("filter_card_item"));
 
         // Priority Stamp — Iron Ingot + Redstone Torch.
-        shaped(RecipeCategory.MISC, new ItemStackTemplate(SDItems.PRIORITY_STAMP.get()))
+        shaped(RecipeCategory.MISC, SDItems.PRIORITY_STAMP.get())
                 .pattern("T")
                 .pattern("I")
                 .define('T', Items.REDSTONE_TORCH)
@@ -46,7 +45,7 @@ public class SDRecipeProvider extends RecipeProvider {
                 .save(output, key("priority_stamp"));
 
         // Linker Node — Iron + Redstone (cheap; one per destination).
-        shaped(RecipeCategory.MISC, new ItemStackTemplate(SDItems.LINKER_NODE.get()))
+        shaped(RecipeCategory.MISC, SDItems.LINKER_NODE.get())
                 .pattern("III")
                 .pattern("IRI")
                 .define('I', Items.IRON_INGOT)
@@ -55,7 +54,7 @@ public class SDRecipeProvider extends RecipeProvider {
                 .save(output, key("linker_node"));
 
         // Depot Controller — Iron Block + Hopper + Comparator (mid-game hub).
-        shaped(RecipeCategory.MISC, new ItemStackTemplate(SDItems.DEPOT_CONTROLLER.get()))
+        shaped(RecipeCategory.MISC, SDItems.DEPOT_CONTROLLER.get())
                 .pattern("H")
                 .pattern("B")
                 .pattern("C")
@@ -66,7 +65,7 @@ public class SDRecipeProvider extends RecipeProvider {
                 .save(output, key("depot_controller"));
 
         // Depot Terminal — Controller + Glass Pane + Redstone (optional QoL).
-        shaped(RecipeCategory.MISC, new ItemStackTemplate(SDItems.DEPOT_TERMINAL.get()))
+        shaped(RecipeCategory.MISC, SDItems.DEPOT_TERMINAL.get())
                 .pattern("R")
                 .pattern("G")
                 .pattern("D")
@@ -77,7 +76,7 @@ public class SDRecipeProvider extends RecipeProvider {
                 .save(output, key("depot_terminal"));
 
         // Overflow Chest — Chest + Iron Ingot + Hopper.
-        shaped(RecipeCategory.MISC, new ItemStackTemplate(SDItems.OVERFLOW_CHEST.get()))
+        shaped(RecipeCategory.MISC, SDItems.OVERFLOW_CHEST.get())
                 .pattern("C")
                 .pattern("I")
                 .pattern("H")
@@ -88,7 +87,7 @@ public class SDRecipeProvider extends RecipeProvider {
                 .save(output, key("overflow_chest"));
 
         // Linker — Iron Ingot + Redstone + Stick (cheap, players need many).
-        shaped(RecipeCategory.MISC, new ItemStackTemplate(SDItems.LINKER.get()))
+        shaped(RecipeCategory.MISC, SDItems.LINKER.get())
                 .pattern("I")
                 .pattern("R")
                 .pattern("S")
@@ -100,7 +99,7 @@ public class SDRecipeProvider extends RecipeProvider {
     }
 
     private static ResourceKey<Recipe<?>> key(String name) {
-        return ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, name));
+        return ResourceKey.create(Registries.RECIPE, ResourceLocation.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, name));
     }
 
     /** Wires the provider into NeoForge's data generation. */

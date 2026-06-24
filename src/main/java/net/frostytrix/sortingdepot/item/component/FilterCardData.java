@@ -14,12 +14,12 @@ import io.netty.buffer.ByteBuf;
 import net.frostytrix.sortingdepot.routing.FilterMode;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 
 /**
  * The data component stored on a Filter Card. This is the Minecraft-facing mirror of the pure
- * {@link FilterMode}: it holds {@link Identifier}s and serializes with Minecraft codecs, then
+ * {@link FilterMode}: it holds {@link ResourceLocation}s and serializes with Minecraft codecs, then
  * {@linkplain #toFilterMode() converts} to the Minecraft-free routing type at the adapter boundary.
  *
  * <p>A card holds <strong>up to {@value #MAX_ITEMS} items</strong> and <strong>up to {@value #MAX_TAGS}
@@ -31,7 +31,7 @@ import net.minecraft.util.StringRepresentable;
  * @param items target item ids for {@link Mode#ITEM}
  * @param tags  tag keys for {@link Mode#TAG}
  */
-public record FilterCardData(Mode mode, List<Identifier> items, Set<Identifier> tags) {
+public record FilterCardData(Mode mode, List<ResourceLocation> items, Set<ResourceLocation> tags) {
 
     /** Maximum number of exact items a single card can list. */
     public static final int MAX_ITEMS = 5;
@@ -66,9 +66,9 @@ public record FilterCardData(Mode mode, List<Identifier> items, Set<Identifier> 
 
     public static final Codec<FilterCardData> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             StringRepresentable.fromEnum(Mode::values).fieldOf("mode").forGetter(FilterCardData::mode),
-            Identifier.CODEC.listOf().optionalFieldOf("items", List.of()).forGetter(FilterCardData::items),
-            Identifier.CODEC.listOf().optionalFieldOf("tags", List.of())
-                    .xmap(list -> (Set<Identifier>) new LinkedHashSet<>(list), List::copyOf)
+            ResourceLocation.CODEC.listOf().optionalFieldOf("items", List.of()).forGetter(FilterCardData::items),
+            ResourceLocation.CODEC.listOf().optionalFieldOf("tags", List.of())
+                    .xmap(list -> (Set<ResourceLocation>) new LinkedHashSet<>(list), List::copyOf)
                     .forGetter(FilterCardData::tags)
     ).apply(inst, FilterCardData::new));
 
@@ -78,8 +78,8 @@ public record FilterCardData(Mode mode, List<Identifier> items, Set<Identifier> 
     /** Convert to the pure routing representation. Identifiers become plain strings. */
     public FilterMode toFilterMode() {
         return switch (mode) {
-            case ITEM -> new FilterMode.ItemFilter(items.stream().map(Identifier::toString).collect(Collectors.toSet()));
-            case TAG -> new FilterMode.TagFilter(tags.stream().map(Identifier::toString).collect(Collectors.toSet()));
+            case ITEM -> new FilterMode.ItemFilter(items.stream().map(ResourceLocation::toString).collect(Collectors.toSet()));
+            case TAG -> new FilterMode.TagFilter(tags.stream().map(ResourceLocation::toString).collect(Collectors.toSet()));
             case OVERFLOW -> new FilterMode.OverflowFilter();
         };
     }
@@ -93,11 +93,11 @@ public record FilterCardData(Mode mode, List<Identifier> items, Set<Identifier> 
      * Adds {@code id} to the item list. No-op (returns {@code this}) if it is already present or the list
      * is already at {@link #MAX_ITEMS}.
      */
-    public FilterCardData withItemAdded(Identifier id) {
+    public FilterCardData withItemAdded(ResourceLocation id) {
         if (items.contains(id) || items.size() >= MAX_ITEMS) {
             return this;
         }
-        List<Identifier> next = new ArrayList<>(items);
+        List<ResourceLocation> next = new ArrayList<>(items);
         next.add(id);
         return new FilterCardData(mode, next, tags);
     }
@@ -107,7 +107,7 @@ public record FilterCardData(Mode mode, List<Identifier> items, Set<Identifier> 
         if (index < 0 || index >= items.size()) {
             return this;
         }
-        List<Identifier> next = new ArrayList<>(items);
+        List<ResourceLocation> next = new ArrayList<>(items);
         next.remove(index);
         return new FilterCardData(mode, next, tags);
     }
@@ -116,8 +116,8 @@ public record FilterCardData(Mode mode, List<Identifier> items, Set<Identifier> 
      * Toggles tag {@code id}: removes it if present, otherwise adds it (no-op when already at
      * {@link #MAX_TAGS}). Insertion order is preserved so the GUI checklist stays stable.
      */
-    public FilterCardData withTagToggled(Identifier id) {
-        LinkedHashSet<Identifier> next = new LinkedHashSet<>(tags);
+    public FilterCardData withTagToggled(ResourceLocation id) {
+        LinkedHashSet<ResourceLocation> next = new LinkedHashSet<>(tags);
         if (next.contains(id)) {
             next.remove(id);
         } else if (next.size() < MAX_TAGS) {

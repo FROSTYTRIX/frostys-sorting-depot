@@ -14,10 +14,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemUtil;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -25,21 +23,21 @@ import org.jetbrains.annotations.Nullable;
  * {@link BlockPos} of the Controller it is registered to. The served inventory is resolved by the
  * Controller from this node's facing direction (added in the routing phase).
  *
- * <p>Storage uses the 26.2 transfer API ({@link ItemStacksResourceHandler}), so the slot can be exposed
- * directly to a {@code ResourceHandlerSlot} in the GUI.
+ * <p>Storage uses a classic {@link ItemStackHandler}; the slot is exposed to a {@code SlotItemHandler}
+ * in the GUI.
  */
 public class LinkerNodeBlockEntity extends BlockEntity {
 
     private static final String FILTER_SLOT_KEY = "filter_slot";
 
-    private final ItemStacksResourceHandler filterSlot = new ItemStacksResourceHandler(1) {
+    private final ItemStackHandler filterSlot = new ItemStackHandler(1) {
         @Override
-        public boolean isValid(int slot, ItemResource resource) {
-            return resource.getItem() instanceof FilterCardItem;
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return stack.getItem() instanceof FilterCardItem;
         }
 
         @Override
-        protected void onContentsChanged(int slot, ItemStack stack) {
+        protected void onContentsChanged(int slot) {
             setChanged();
         }
     };
@@ -52,14 +50,14 @@ public class LinkerNodeBlockEntity extends BlockEntity {
         super(SDBlockEntities.LINKER_NODE.get(), pos, state);
     }
 
-    /** The Filter Card slot, exposed for the menu/GUI and as a capability source. */
-    public ItemStacksResourceHandler getFilterSlot() {
+    /** The Filter Card slot, exposed for the menu/GUI. */
+    public ItemStackHandler getFilterSlot() {
         return filterSlot;
     }
 
     /** The currently inserted Filter Card stack (may be empty). */
     public ItemStack getFilterCard() {
-        return ItemUtil.getStack(filterSlot, 0);
+        return filterSlot.getStackInSlot(0);
     }
 
     /** The routing filter for this destination, or {@code null} if no (valid) card is inserted. */
@@ -72,13 +70,13 @@ public class LinkerNodeBlockEntity extends BlockEntity {
     }
 
     /** The item capability of the inventory this node faces, or {@code null} if there is none. */
-    public @Nullable ResourceHandler<ItemResource> getTargetHandler() {
+    public @Nullable IItemHandler getTargetHandler() {
         if (level == null) {
             return null;
         }
         Direction facing = getBlockState().getValue(LinkerNodeBlock.FACING);
         BlockPos targetPos = worldPosition.relative(facing);
-        return level.getCapability(Capabilities.Item.BLOCK, targetPos, facing.getOpposite());
+        return level.getCapability(Capabilities.ItemHandler.BLOCK, targetPos, facing.getOpposite());
     }
 
     public int getPriority() {

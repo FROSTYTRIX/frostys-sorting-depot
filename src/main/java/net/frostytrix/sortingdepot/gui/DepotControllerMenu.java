@@ -12,7 +12,7 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
+import net.neoforged.neoforge.items.SlotItemHandler;
 
 /**
  * Menu for the Depot Controller: exposes the single input-buffer slot (so players can see and retrieve
@@ -34,7 +34,7 @@ public class DepotControllerMenu extends AbstractContainerMenu {
         this.access = ContainerLevelAccess.create(controller.getLevel(), controller.getBlockPos());
 
         // Compact layout: single input slot up top, player inventory directly below (no chest-sized gap).
-        addSlot(new ResourceHandlerSlot(controller.getInputHandler(), controller.getInputHandler()::set, 0, 80, 18));
+        addSlot(new SlotItemHandler(controller.getInputHandler(), 0, 80, 18));
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {

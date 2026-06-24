@@ -11,7 +11,7 @@ import net.frostytrix.sortingdepot.registry.SDDataComponents;
 import net.frostytrix.sortingdepot.registry.SDMenus;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
@@ -86,16 +86,16 @@ public class FilterCardMenu extends AbstractContainerMenu {
      * sorted by id. Computed identically on client (to render the checklist) and server (to resolve a
      * toggle-by-index click) so the two never disagree.
      */
-    public static List<Identifier> availableTags(List<Identifier> items) {
-        LinkedHashSet<Identifier> tags = new LinkedHashSet<>();
-        for (Identifier id : items) {
+    public static List<ResourceLocation> availableTags(List<ResourceLocation> items) {
+        LinkedHashSet<ResourceLocation> tags = new LinkedHashSet<>();
+        for (ResourceLocation id : items) {
             Item item = BuiltInRegistries.ITEM.getValue(id);
             if (item == Items.AIR) {
                 continue;
             }
             item.builtInRegistryHolder().tags().map(TagKey::location).forEach(tags::add);
         }
-        return tags.stream().sorted(Comparator.comparing(Identifier::toString)).toList();
+        return tags.stream().sorted(Comparator.comparing(ResourceLocation::toString)).toList();
     }
 
     /**
@@ -103,10 +103,10 @@ public class FilterCardMenu extends AbstractContainerMenu {
      * tags, sorted by id. Including selected tags guarantees a tag stays visible (and so removable) even
      * after the item that contributed it is removed — otherwise it would be stuck on the card.
      */
-    public static List<Identifier> displayedTags(List<Identifier> items, Set<Identifier> selected) {
-        LinkedHashSet<Identifier> tags = new LinkedHashSet<>(availableTags(items));
+    public static List<ResourceLocation> displayedTags(List<ResourceLocation> items, Set<ResourceLocation> selected) {
+        LinkedHashSet<ResourceLocation> tags = new LinkedHashSet<>(availableTags(items));
         tags.addAll(selected);
-        return tags.stream().sorted(Comparator.comparing(Identifier::toString)).toList();
+        return tags.stream().sorted(Comparator.comparing(ResourceLocation::toString)).toList();
     }
 
     @Override
@@ -136,7 +136,7 @@ public class FilterCardMenu extends AbstractContainerMenu {
             }
             updated = d.withItemAdded(BuiltInRegistries.ITEM.getKey(toAdd.getItem()));
         } else if (id >= BTN_TOGGLE_TAG) {
-            List<Identifier> tags = displayedTags(d.items(), d.tags());
+            List<ResourceLocation> tags = displayedTags(d.items(), d.tags());
             int idx = id - BTN_TOGGLE_TAG;
             if (idx < 0 || idx >= tags.size()) {
                 return false;

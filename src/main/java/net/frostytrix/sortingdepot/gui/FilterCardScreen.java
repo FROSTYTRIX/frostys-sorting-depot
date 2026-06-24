@@ -4,12 +4,11 @@ import java.util.List;
 
 import net.frostytrix.sortingdepot.item.FilterCardItem;
 import net.frostytrix.sortingdepot.item.component.FilterCardData;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -59,13 +58,14 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
     private int tagScroll;
 
     public FilterCardScreen(FilterCardMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, 176, GUI_HEIGHT);
+        super(menu, inventory, title);
+        this.imageWidth = 176;
+        this.imageHeight = GUI_HEIGHT;
         this.inventoryLabelY = INV_FRAME_ROW0_Y - 12;
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractBackground(graphics, mouseX, mouseY, partialTick);
+    protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         int x = leftPos;
         int y = topPos;
 
@@ -92,22 +92,22 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
         drawButton(graphics, x + MODE_X[2], y + MODE_Y, modeLabel("overflow"), mode == FilterCardData.Mode.OVERFLOW);
 
         if (mode == FilterCardData.Mode.OVERFLOW) {
-            graphics.centeredText(font, Component.translatable("gui.frostyssortingdepot.filter_card.overflow"),
+            graphics.drawCenteredString(font, Component.translatable("gui.frostyssortingdepot.filter_card.overflow"),
                     x + imageWidth / 2, y + GHOST_Y + 8, TEXT);
         } else {
             // Ghost slots showing the chosen items.
-            List<Identifier> items = d.items();
+            List<ResourceLocation> items = d.items();
             for (int i = 0; i < FilterCardData.MAX_ITEMS; i++) {
                 int gx = x + GHOST_X + i * SLOT;
                 drawSlot(graphics, gx, y + GHOST_Y);
                 if (i < items.size()) {
                     ItemStack icon = new ItemStack(BuiltInRegistries.ITEM.getValue(items.get(i)));
-                    graphics.item(icon, gx + 1, y + GHOST_Y + 1);
+                    graphics.renderItem(icon, gx + 1, y + GHOST_Y + 1);
                 }
             }
 
             if (mode == FilterCardData.Mode.ITEM) {
-                graphics.text(font, Component.translatable("gui.frostyssortingdepot.filter_card.add_items",
+                graphics.drawString(font, Component.translatable("gui.frostyssortingdepot.filter_card.add_items",
                         items.size(), FilterCardData.MAX_ITEMS), x + 8, y + GHOST_Y + SLOT + 4, TEXT, false);
             } else {
                 drawTagList(graphics, x, y, d, mouseX, mouseY);
@@ -115,17 +115,17 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
         }
     }
 
-    private void drawTagList(GuiGraphicsExtractor graphics, int x, int y, FilterCardData d, int mouseX, int mouseY) {
-        List<Identifier> tags = FilterCardMenu.displayedTags(d.items(), d.tags());
+    private void drawTagList(GuiGraphics graphics, int x, int y, FilterCardData d, int mouseX, int mouseY) {
+        List<ResourceLocation> tags = FilterCardMenu.displayedTags(d.items(), d.tags());
         if (tags.isEmpty()) {
-            graphics.text(font, Component.translatable("gui.frostyssortingdepot.filter_card.no_tags"),
+            graphics.drawString(font, Component.translatable("gui.frostyssortingdepot.filter_card.no_tags"),
                     x + 8, y + TAG_Y, TEXT, false);
             return;
         }
-        graphics.text(font, Component.translatable("gui.frostyssortingdepot.filter_card.tags",
+        graphics.drawString(font, Component.translatable("gui.frostyssortingdepot.filter_card.tags",
                 d.tags().size(), FilterCardData.MAX_TAGS), x + 8, y + TAGS_COUNT_Y, TEXT, false);
         if (tags.size() > TAG_VISIBLE) {
-            graphics.text(font, Component.literal("▲▼"), x + imageWidth - 22, y + TAGS_COUNT_Y, TEXT, false);
+            graphics.drawString(font, Component.literal("▲▼"), x + imageWidth - 22, y + TAGS_COUNT_Y, TEXT, false);
         }
 
         int maxTextWidth = imageWidth - TAG_TEXT_X - 6;
@@ -135,7 +135,7 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
             if (idx >= tags.size()) {
                 break;
             }
-            Identifier tag = tags.get(idx);
+            ResourceLocation tag = tags.get(idx);
             int ry = y + TAG_Y + r * TAG_ROW_H;
             // Checkbox.
             graphics.fill(x + 10, ry, x + 20, ry + 10, SLOT_INNER);
@@ -145,19 +145,19 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
             // Tag name, ellipsized to fit; full id shown as a tooltip on hover.
             String full = "#" + tag;
             String shown = fitWidth(full, maxTextWidth);
-            graphics.text(font, Component.literal(shown), x + TAG_TEXT_X, ry + 1, TEXT, false);
+            graphics.drawString(font, Component.literal(shown), x + TAG_TEXT_X, ry + 1, TEXT, false);
             if (!shown.equals(full) && inRect(mouseX - x, mouseY - y, 10, TAG_Y + r * TAG_ROW_H, imageWidth - 20, 10)) {
-                graphics.setTooltipForNextFrame(Component.literal(full), mouseX, mouseY);
+                graphics.setTooltipForNextFrame(font, Component.literal(full), mouseX, mouseY);
             }
         }
     }
 
-    private void drawButton(GuiGraphicsExtractor graphics, int bx, int by, Component label, boolean active) {
+    private void drawButton(GuiGraphics graphics, int bx, int by, Component label, boolean active) {
         graphics.fill(bx, by, bx + MODE_W, by + MODE_H, active ? BTN_ACTIVE : BTN);
-        graphics.centeredText(font, label, bx + MODE_W / 2, by + (MODE_H - 8) / 2, TEXT_WHITE);
+        graphics.drawCenteredString(font, label, bx + MODE_W / 2, by + (MODE_H - 8) / 2, TEXT_WHITE);
     }
 
-    private static void drawSlot(GuiGraphicsExtractor graphics, int sx, int sy) {
+    private static void drawSlot(GuiGraphics graphics, int sx, int sy) {
         graphics.fill(sx, sy, sx + SLOT, sy + SLOT, SLOT_BG);
         graphics.fill(sx + 1, sy + 1, sx + SLOT - 1, sy + SLOT - 1, SLOT_INNER);
     }
@@ -167,17 +167,17 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
     }
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
-        // Title + "Inventory" label (default positions).
-        graphics.text(font, title, titleLabelX, titleLabelY, TEXT, false);
-        graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+        // Title + "Inventory" label (relative to the GUI origin).
+        graphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        graphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == 0) {
-            int rx = (int) event.x() - leftPos;
-            int ry = (int) event.y() - topPos;
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            int rx = (int) mouseX - leftPos;
+            int ry = (int) mouseY - topPos;
             FilterCardData d = menu.filterData();
             FilterCardData.Mode mode = d.mode();
 
@@ -204,7 +204,7 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
                 }
                 // Tag toggle.
                 if (mode == FilterCardData.Mode.TAG) {
-                    List<Identifier> tags = FilterCardMenu.displayedTags(d.items(), d.tags());
+                    List<ResourceLocation> tags = FilterCardMenu.displayedTags(d.items(), d.tags());
                     for (int r = 0; r < TAG_VISIBLE; r++) {
                         int idx = tagScroll + r;
                         if (idx < tags.size() && inRect(rx, ry, 10, TAG_Y + r * TAG_ROW_H, imageWidth - 20, 10)) {
@@ -213,20 +213,20 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
                     }
                 }
                 // Add an inventory item by clicking it.
-                Slot hovered = getHoveredSlot();
+                Slot hovered = this.hoveredSlot;
                 if (hovered != null && hovered.hasItem() && !(hovered.getItem().getItem() instanceof FilterCardItem)) {
                     return click(FilterCardMenu.BTN_ADD_SLOT + hovered.index);
                 }
             }
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if (menu.filterData().mode() == FilterCardData.Mode.TAG) {
             FilterCardData d = menu.filterData();
-            List<Identifier> tags = FilterCardMenu.displayedTags(d.items(), d.tags());
+            List<ResourceLocation> tags = FilterCardMenu.displayedTags(d.items(), d.tags());
             int max = Math.max(0, tags.size() - TAG_VISIBLE);
             tagScroll = Math.clamp((int) (tagScroll - scrollY), 0, max);
             return true;

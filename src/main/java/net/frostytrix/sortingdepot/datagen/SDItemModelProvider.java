@@ -11,7 +11,7 @@ import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
@@ -45,7 +45,7 @@ public class SDItemModelProvider extends ModelProvider {
         // Overflow Chest is an entity-rendered chest: particle-only blockstate + a 3D chest item model.
         // The chest sprite mapper prepends "entity/chest/", so pass the SHORT name (like vanilla "normal").
         blockModels.createChest(SDBlocks.OVERFLOW_CHEST.get(), Blocks.OAK_PLANKS,
-                Identifier.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, "overflow"), false);
+                ResourceLocation.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, "overflow"), false);
     }
 
     /**
@@ -53,7 +53,7 @@ public class SDItemModelProvider extends ModelProvider {
      * {@code src/main/resources}). Optionally rotates the blockstate by {@code facing}.
      */
     private static void handModeledBlock(BlockModelGenerators blockModels, Block block, boolean facing) {
-        Identifier model = ModelLocationUtils.getModelLocation(block);
+        ResourceLocation model = ModelLocationUtils.getModelLocation(block);
         MultiVariant variant = BlockModelGenerators.plainVariant(model);
         if (facing) {
             blockModels.blockStateOutput.accept(
