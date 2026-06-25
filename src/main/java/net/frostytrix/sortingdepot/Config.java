@@ -18,12 +18,21 @@ public final class Config {
             .define("linkerBeam.show", true);
 
     public static final ModConfigSpec.ConfigValue<String> BEAM_COLOR = BUILDER
-            .comment("Linker beam colour as hex RGB (\"33CCCC\") or ARGB (\"FF33CCCC\").")
+            .comment("Linker beam/outline colour as hex RGB (\"33CCCC\") or ARGB (\"FF33CCCC\").")
             .define("linkerBeam.color", "33CCCC", Config::isHexColor);
 
     public static final ModConfigSpec.DoubleValue BEAM_WIDTH = BUILDER
-            .comment("Linker beam line width.")
-            .defineInRange("linkerBeam.width", 3.0, 0.5, 16.0);
+            .comment("Width of the beam lines (the vertical beam and the controller-to-node wires).")
+            .defineInRange("linkerBeam.lineWidth", 3.0, 0.5, 16.0);
+
+    public static final ModConfigSpec.DoubleValue OUTLINE_WIDTH = BUILDER
+            .comment("Width of the selected node's block outline.")
+            .defineInRange("linkerBeam.outlineWidth", 2.5, 0.5, 16.0);
+
+    public static final ModConfigSpec.BooleanValue SHOW_WIRING = BUILDER
+            .comment("Also draw a wire from each nearby Controller to its linked nodes while holding a"
+                    + " Linker. Off by default — with many nodes this can be a lot of lines.")
+            .define("linkerBeam.showWiring", false);
 
     public static final ModConfigSpec SPEC = BUILDER.build();
 
@@ -41,5 +50,10 @@ public final class Config {
     /** The configured beam line width. */
     public static float beamWidth() {
         return (float) (double) BEAM_WIDTH.get();
+    }
+
+    /** The configured selected-node outline width. */
+    public static float outlineWidth() {
+        return (float) (double) OUTLINE_WIDTH.get();
     }
 }

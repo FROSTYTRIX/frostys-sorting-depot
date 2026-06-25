@@ -14,6 +14,8 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
@@ -23,8 +25,10 @@ import net.neoforged.neoforge.common.NeoForge;
 @EventBusSubscriber(modid = FrostysSortingDepot.MOD_ID, value = Dist.CLIENT)
 public class FrostysSortingDepotClient {
     public FrostysSortingDepotClient(ModContainer container) {
-        // Client-only visual settings (Linker beam colour/width/toggle).
+        // Client-only visual settings (Linker beam colour/width/toggle) + its in-game config screen.
         container.registerConfig(ModConfig.Type.CLIENT, Config.SPEC);
+        container.registerExtensionPoint(IConfigScreenFactory.class,
+                (modContainer, parent) -> new ConfigurationScreen(modContainer, parent));
 
         // World-overlay beams render on the game bus, not the mod bus.
         NeoForge.EVENT_BUS.addListener(

@@ -93,12 +93,21 @@ public class DepotControllerBlockEntity extends BlockEntity {
         if (!linkers.contains(immutable)) {
             linkers.add(immutable);
             setChanged();
+            syncToClient();
         }
     }
 
     public void removeLinker(BlockPos pos) {
         if (linkers.remove(pos.immutable())) {
             setChanged();
+            syncToClient();
+        }
+    }
+
+    /** Pushes a block update so the client copy of {@link #linkers} stays current (used by the beam). */
+    private void syncToClient() {
+        if (level != null && !level.isClientSide()) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }
 
@@ -238,6 +247,18 @@ public class DepotControllerBlockEntity extends BlockEntity {
             tx.commit();
             return remaining;
         }
+    }
+
+    // --- client sync (for the Linker wiring beam) ----------------------------------------------
+
+    @Override
+    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+        return saveCustomOnly(registries); // includes the linker list
+    }
+
+    @Override
+    public @Nullable net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
     }
 
     // --- persistence ---------------------------------------------------------------------------
