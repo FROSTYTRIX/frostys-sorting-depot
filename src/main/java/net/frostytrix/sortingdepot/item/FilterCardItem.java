@@ -56,8 +56,11 @@ public class FilterCardItem extends Item {
                 .withStyle(ChatFormatting.GRAY));
 
         Component detail = switch (d.mode()) {
-            case ITEM -> Component.translatable("item.frostyssortingdepot.filter_card.items",
+            case ITEM -> Component.translatable(d.strict()
+                            ? "item.frostyssortingdepot.filter_card.items_strict"
+                            : "item.frostyssortingdepot.filter_card.items",
                     d.items().size(), FilterCardData.MAX_ITEMS);
+            case MOD -> Component.translatable("item.frostyssortingdepot.filter_card.mods", d.items().size());
             case TAG -> Component.translatable("item.frostyssortingdepot.filter_card.tags",
                     d.tags().size(), FilterCardData.MAX_TAGS);
             case OVERFLOW -> Component.translatable("item.frostyssortingdepot.filter_card.overflow");

@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
 import net.frostytrix.sortingdepot.datagen.SDDataGenerators;
+import net.frostytrix.sortingdepot.network.SDNetwork;
 import net.frostytrix.sortingdepot.registry.SDBlockEntities;
 import net.frostytrix.sortingdepot.registry.SDBlocks;
 import net.frostytrix.sortingdepot.registry.SDCapabilities;
@@ -28,6 +29,8 @@ public class FrostysSortingDepot {
         SDBlockEntities.register(modEventBus);
         SDItems.register(modEventBus);
         SDMenus.register(modEventBus);
+        modEventBus.addListener(SDNetwork::register);
+
 
         // Expose block capabilities (Controller input on top face).
         modEventBus.addListener(SDCapabilities::register);

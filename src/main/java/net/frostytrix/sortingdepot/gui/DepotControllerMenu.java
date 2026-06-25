@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -23,7 +24,12 @@ public class DepotControllerMenu extends AbstractContainerMenu {
     private static final int INPUT_SLOT = 0;
     private static final int INV_START = 1;
 
+    /** Button id (via clickMenuButton) that toggles round-robin distribution. */
+    public static final int BTN_TOGGLE_ROUND_ROBIN = 0;
+
     private final ContainerLevelAccess access;
+    private final DepotControllerBlockEntity controller;
+    private boolean roundRobin; // synced to the client for the toggle button's state
 
     public DepotControllerMenu(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf data) {
         this(containerId, playerInventory, resolve(playerInventory, data.readBlockPos()));
@@ -31,10 +37,24 @@ public class DepotControllerMenu extends AbstractContainerMenu {
 
     public DepotControllerMenu(int containerId, Inventory playerInventory, DepotControllerBlockEntity controller) {
         super(SDMenus.DEPOT_CONTROLLER.get(), containerId);
+        this.controller = controller;
         this.access = ContainerLevelAccess.create(controller.getLevel(), controller.getBlockPos());
 
         // Compact layout: single input slot up top, player inventory directly below (no chest-sized gap).
         addSlot(new SlotItemHandler(controller.getInputHandler(), 0, 80, 18));
+
+        // Sync round-robin state so the screen can label its toggle button.
+        addDataSlot(new DataSlot() {
+            @Override
+            public int get() {
+                return controller.isRoundRobin() ? 1 : 0;
+            }
+
+            @Override
+            public void set(int value) {
+                roundRobin = value != 0;
+            }
+        });
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
@@ -52,6 +72,20 @@ public class DepotControllerMenu extends AbstractContainerMenu {
             return controller;
         }
         throw new IllegalStateException("No Depot Controller block entity at " + pos);
+    }
+
+    /** Whether round-robin is on (synced to the client for the button label). */
+    public boolean isRoundRobin() {
+        return roundRobin;
+    }
+
+    @Override
+    public boolean clickMenuButton(Player player, int id) {
+        if (id == BTN_TOGGLE_ROUND_ROBIN) {
+            controller.setRoundRobin(!controller.isRoundRobin());
+            return true;
+        }
+        return false;
     }
 
     @Override
