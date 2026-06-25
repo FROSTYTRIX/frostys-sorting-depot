@@ -13,6 +13,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
@@ -22,6 +23,9 @@ import net.neoforged.neoforge.common.NeoForge;
 @EventBusSubscriber(modid = FrostysSortingDepot.MOD_ID, value = Dist.CLIENT)
 public class FrostysSortingDepotClient {
     public FrostysSortingDepotClient(ModContainer container) {
+        // Client-only visual settings (Linker beam colour/width/toggle).
+        container.registerConfig(ModConfig.Type.CLIENT, Config.SPEC);
+
         // World-overlay beams render on the game bus, not the mod bus.
         NeoForge.EVENT_BUS.addListener(
                 (RenderLevelStageEvent.AfterTranslucentBlocks event) -> SDLinkerBeams.onRenderLevelStage(event));
