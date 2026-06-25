@@ -53,4 +53,47 @@ public final class RoutingEngine {
         }
         return bestIndex;
     }
+
+    /**
+     * Like {@link #chooseTarget} but, among the eligible destinations sharing the <em>highest</em>
+     * priority, distributes in rotation instead of always picking the first. {@code rotation} is a
+     * monotonically increasing counter the caller advances after each successful move; the winner is
+     * {@code tier[rotation mod tier.size]}. Lower priorities are still only used when the whole top tier
+     * is full/unmatched, so priority ordering is preserved — round-robin only load-balances ties.
+     *
+     * @return the chosen index, or {@link #NO_TARGET} if no candidate accepts the item
+     */
+    public static int chooseRoundRobin(RoutableItem item, List<Candidate> candidates, int rotation) {
+        int bestPriority = Integer.MIN_VALUE;
+        int tierSize = 0;
+        // First pass: find the highest priority among eligible candidates and how many share it.
+        for (Candidate c : candidates) {
+            if (!c.slotAvailable() || !FilterMatcher.matches(item, c.filter())) {
+                continue;
+            }
+            if (c.priority() > bestPriority) {
+                bestPriority = c.priority();
+                tierSize = 1;
+            } else if (c.priority() == bestPriority) {
+                tierSize++;
+            }
+        }
+        if (tierSize == 0) {
+            return NO_TARGET;
+        }
+        // Second pass: walk the tier in list order and return the one at the rotated position.
+        int pick = Math.floorMod(rotation, tierSize);
+        int seen = 0;
+        for (int i = 0; i < candidates.size(); i++) {
+            Candidate c = candidates.get(i);
+            if (!c.slotAvailable() || !FilterMatcher.matches(item, c.filter()) || c.priority() != bestPriority) {
+                continue;
+            }
+            if (seen == pick) {
+                return i;
+            }
+            seen++;
+        }
+        return NO_TARGET; // unreachable
+    }
 }

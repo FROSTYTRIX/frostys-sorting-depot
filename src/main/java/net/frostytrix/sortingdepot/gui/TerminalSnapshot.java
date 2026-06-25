@@ -12,6 +12,7 @@ import net.frostytrix.sortingdepot.item.FilterCardItem;
 import net.frostytrix.sortingdepot.item.component.FilterCardData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -69,9 +70,19 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
         }
         FilterCardData data = FilterCardItem.data(card);
         return switch (data.mode()) {
-            case ITEM -> data.items().isEmpty()
-                    ? "Items: -"
-                    : "Items: " + data.items().stream().map(ResourceLocation::getPath).collect(Collectors.joining(", "));
+            case ITEM -> {
+                String prefix = data.strict() ? "Items (NBT): " : "Items: ";
+                yield data.items().isEmpty()
+                        ? prefix + "-"
+                        : prefix + data.items().stream()
+                                .map(s -> BuiltInRegistries.ITEM.getKey(s.getItem()).getPath())
+                                .collect(Collectors.joining(", "));
+            }
+            case MOD -> data.items().isEmpty()
+                    ? "Mods: -"
+                    : "Mods: " + data.items().stream()
+                            .map(s -> BuiltInRegistries.ITEM.getKey(s.getItem()).getNamespace())
+                            .distinct().collect(Collectors.joining(", "));
             case TAG -> data.tags().isEmpty()
                     ? "Tags: -"
                     : data.tags().stream().map(id -> "#" + id.getPath()).collect(Collectors.joining(", "));
