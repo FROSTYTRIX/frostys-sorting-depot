@@ -68,11 +68,19 @@
   "advancements.frostyssortingdepot.terminal.title": "At a Glance",
   "advancements.frostyssortingdepot.terminal.description": "Craft a Depot Terminal to oversee your network",
 
-  "frostyssortingdepot.configuration.title": "Frosty's Sorting Depot Configs",
-  "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml": "Frosty's Sorting Depot Configs",
-  "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml.title": "Frosty's Sorting Depot Configs",
-  "frostyssortingdepot.configuration.items": "Item List",
-  "frostyssortingdepot.configuration.logDirtBlock": "Log Dirt Block",
-  "frostyssortingdepot.configuration.magicNumberIntroduction": "Magic Number Text",
-  "frostyssortingdepot.configuration.magicNumber": "Magic Number"
+  "frostyssortingdepot.configuration.title": "Frosty's Sorting Depot",
+  "frostyssortingdepot.configuration.section.frostyssortingdepot.client.toml": "Client Settings",
+  "frostyssortingdepot.configuration.section.frostyssortingdepot.client.toml.title": "Client Settings",
+
+  "frostyssortingdepot.configuration.linkerBeam": "Linker Beam",
+  "frostyssortingdepot.configuration.linkerBeam.show": "Show Beam",
+  "frostyssortingdepot.configuration.linkerBeam.show.tooltip": "Draw a highlight and short vertical beam on the Linker Node currently selected by a held Linker.",
+  "frostyssortingdepot.configuration.linkerBeam.color": "Colour",
+  "frostyssortingdepot.configuration.linkerBeam.color.tooltip": "Beam and outline colour as hex RGB (\"33CCCC\") or ARGB (\"FF33CCCC\").",
+  "frostyssortingdepot.configuration.linkerBeam.lineWidth": "Line Width",
+  "frostyssortingdepot.configuration.linkerBeam.lineWidth.tooltip": "Width of the beam line and the Controller-to-node wires. (Note: only affects MC 26.2; the 1.21.x builds use a fixed line width.)",
+  "frostyssortingdepot.configuration.linkerBeam.outlineWidth": "Outline Width",
+  "frostyssortingdepot.configuration.linkerBeam.outlineWidth.tooltip": "Width of the selected node's block outline. (Note: only affects MC 26.2.)",
+  "frostyssortingdepot.configuration.linkerBeam.showWiring": "Show Wiring (default)",
+  "frostyssortingdepot.configuration.linkerBeam.showWiring.tooltip": "If on, also draws a wire from every nearby Controller to each of its linked nodes. Can be toggled in-game with the Toggle Linker Wiring keybind."
 }
