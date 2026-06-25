@@ -33,7 +33,20 @@ public final class SDLinkerBeams {
 
     private static boolean warnedNoCollector;
 
+    /** Session override for the wiring overlay: {@code null} = use the config default. Toggled by keybind. */
+    private static Boolean wiringOverride;
+
     private SDLinkerBeams() {
+    }
+
+    /** Whether the Controller → node wiring overlay is currently shown (keybind override, else config). */
+    public static boolean wiringActive() {
+        return wiringOverride != null ? wiringOverride : Config.SHOW_WIRING.get();
+    }
+
+    /** Flips the wiring overlay for this session (called from the keybind). */
+    public static void toggleWiring() {
+        wiringOverride = !wiringActive();
     }
 
     public static void onRenderLevelStage(RenderLevelStageEvent.AfterTranslucentBlocks event) {
@@ -51,7 +64,7 @@ public final class SDLinkerBeams {
                     Gizmos.line(base, base.add(0.0, 2.5, 0.0), color, Config.beamWidth());
                 }
             }
-            if (Config.SHOW_WIRING.get()) {
+            if (wiringActive()) {
                 drawWiring(mc, color, Config.beamWidth());
             }
         } catch (IllegalStateException noCollector) {

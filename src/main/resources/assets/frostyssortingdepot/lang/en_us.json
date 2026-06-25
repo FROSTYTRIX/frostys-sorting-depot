@@ -37,6 +37,10 @@
   "gui.frostyssortingdepot.controller.first_match": "First-match",
   "gui.frostyssortingdepot.controller.round_robin": "Round-robin",
 
+  "key.frostyssortingdepot.toggle_wiring": "Toggle Linker Wiring",
+  "gui.frostyssortingdepot.wiring.on": "Linker wiring: ON",
+  "gui.frostyssortingdepot.wiring.off": "Linker wiring: OFF",
+
   "gui.frostyssortingdepot.filter_card.btn.item": "Item",
   "gui.frostyssortingdepot.filter_card.btn.mod": "Mod",
   "gui.frostyssortingdepot.filter_card.btn.tag": "Tag",
