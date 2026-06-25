@@ -2,6 +2,38 @@
 
 All notable changes to Frosty's Sorting Depot are documented here.
 
+## 1.1.0 — 2026-06-25
+
+### Added
+- **Filter Card: Mod mode.** A fourth matching mode that catches any item sharing a namespace with the
+  items you added to the card — e.g. drop one Create item in to route everything from `create:`.
+- **Filter Card: strict NBT matching.** A per-card checkbox in Item mode that also compares item
+  components, so you can route, say, a specific enchanted book without matching plain books. Cards now
+  store full item stacks (not just ids) to keep the components around.
+- **Depot Controller: round-robin distribution.** A toggle button in the Controller GUI that spreads
+  items across equal-priority destinations in rotation instead of always filling the first. Priority
+  ordering is still respected — only ties are load-balanced. Persists per Controller.
+- **Live Depot Terminal.** The dashboard now refreshes ~twice a second while the menu is open instead of
+  being a one-shot snapshot. Open the Terminal once, watch fill levels move in real time.
+- **Linker beam overlay.** While holding a Linker, the currently-selected node is outlined in cyan with
+  a short vertical beam — much easier to see what your next Controller click will register. Optional:
+  toggle the **Controller → linked-node wires** with the new **Toggle Linker Wiring** keybind (default
+  **B**, rebindable, off by default so you don't get flash-banged with many nodes).
+- **Client config screen for the beam.** Mods → Config exposes the beam toggle, colour (hex RGB/ARGB),
+  line width, outline width, and the wiring default.
+
+### Changed
+- The Filter Card configuration screen now has four mode buttons (Item / Mod / Tag / Any), a strict
+  checkbox in Item mode, and a Mod-namespaces line in Mod mode.
+- The Depot Terminal's "filter" column now shows `Items (NBT)` for strict cards and lists mod ids for
+  Mod-mode cards.
+
+### Notes
+- Routing-engine unit tests grew from 21 to 29 (added Mod / strict / round-robin coverage).
+- **Per-version caveat:** the `linkerBeam.lineWidth` and `linkerBeam.outlineWidth` config values only
+  take effect on the 26.2 build. The 1.21.x builds use the classic immediate-mode line renderer, which
+  has a fixed line width — the colour, the on/off, the wiring toggle, and the keybind all work there.
+
 ## 1.0.2 — 2026-06-24
 
 ### Fixed
