@@ -54,12 +54,26 @@ public class DepotControllerBlockEntity extends BlockEntity {
     /** Registered Linker Nodes, in registration order (drives same-priority tie-breaking). */
     private final List<BlockPos> linkers = new ArrayList<>();
 
+    /** When true, equal-priority destinations are filled in rotation instead of first-to-last. */
+    private boolean roundRobin;
+    /** Rotation counter for round-robin; advanced after each successful move to a real destination. */
+    private int rrCursor;
+
     public DepotControllerBlockEntity(BlockPos pos, BlockState state) {
         super(SDBlockEntities.DEPOT_CONTROLLER.get(), pos, state);
     }
 
     public ItemStackHandler getInputHandler() {
         return input;
+    }
+
+    public boolean isRoundRobin() {
+        return roundRobin;
+    }
+
+    public void setRoundRobin(boolean value) {
+        this.roundRobin = value;
+        setChanged();
     }
 
     /** Redstone signal (0–15) for a comparator: 0 when the buffer is empty, scaling up with how full it is. */
@@ -77,12 +91,21 @@ public class DepotControllerBlockEntity extends BlockEntity {
         if (!linkers.contains(immutable)) {
             linkers.add(immutable);
             setChanged();
+            syncToClient();
         }
     }
 
     public void removeLinker(BlockPos pos) {
         if (linkers.remove(pos.immutable())) {
             setChanged();
+            syncToClient();
+        }
+    }
+
+    /** Pushes a block update so the client copy of {@link #linkers} stays current (used by the beam). */
+    private void syncToClient() {
+        if (level != null && !level.isClientSide()) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }
 
@@ -158,7 +181,9 @@ public class DepotControllerBlockEntity extends BlockEntity {
                 targets.add(target);
             }
 
-            int index = RoutingEngine.chooseTarget(routable, candidates);
+            int index = roundRobin
+                    ? RoutingEngine.chooseRoundRobin(routable, candidates, rrCursor)
+                    : RoutingEngine.chooseTarget(routable, candidates);
             IItemHandler target = index >= 0 ? targets.get(index) : findOverflow(level);
             if (target == null) {
                 break; // nothing accepts it — leave it buffered, never voided
@@ -168,6 +193,10 @@ public class DepotControllerBlockEntity extends BlockEntity {
             int moved = toMove.getCount() - insert(target, toMove).getCount();
             if (moved == 0) {
                 break; // everything full — avoid spinning
+            }
+            // Advance the rotation only after a real (non-overflow) destination accepted something.
+            if (roundRobin && index >= 0) {
+                rrCursor++;
             }
             budget -= moved;
             remaining = remaining.copyWithCount(remaining.getCount() - moved);
@@ -211,6 +240,18 @@ public class DepotControllerBlockEntity extends BlockEntity {
         return ItemHandlerHelper.insertItem(target, stack, false);
     }
 
+    // --- client sync (for the Linker wiring beam) ----------------------------------------------
+
+    @Override
+    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+        return saveCustomOnly(registries); // includes the linker list
+    }
+
+    @Override
+    public @Nullable net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
+
     // --- persistence ---------------------------------------------------------------------------
 
     @Override
@@ -227,6 +268,7 @@ public class DepotControllerBlockEntity extends BlockEntity {
         super.saveAdditional(output);
         input.serialize(output.child(INPUT_KEY));
         output.store("linkers", BlockPos.CODEC.listOf(), linkers);
+        output.putBoolean("round_robin", roundRobin);
     }
 
     @Override
@@ -235,5 +277,6 @@ public class DepotControllerBlockEntity extends BlockEntity {
         input.child(INPUT_KEY).ifPresent(this.input::deserialize);
         linkers.clear();
         linkers.addAll(input.read("linkers", BlockPos.CODEC.listOf()).orElse(List.of()));
+        roundRobin = input.getBooleanOr("round_robin", false);
     }
 }

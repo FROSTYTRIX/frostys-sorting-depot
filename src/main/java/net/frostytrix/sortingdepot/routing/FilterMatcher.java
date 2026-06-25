@@ -18,13 +18,16 @@ public final class FilterMatcher {
         return switch (filter) {
             case FilterMode.ItemFilter f -> matchesItem(item, f);
             case FilterMode.TagFilter f -> matchesTag(item, f);
+            case FilterMode.ModFilter f -> f.namespaces().contains(item.namespace());
             case FilterMode.OverflowFilter ignored -> true;
         };
     }
 
     private static boolean matchesItem(RoutableItem item, FilterMode.ItemFilter filter) {
-        // Accept if the item's id is any of the ids the card lists (matching on id alone).
-        return filter.itemIds().contains(item.itemId());
+        // Strict cards compare the id + component snapshot; lenient cards match on id alone.
+        return filter.strict()
+                ? filter.keys().contains(item.strictKey())
+                : filter.keys().contains(item.itemId());
     }
 
     private static boolean matchesTag(RoutableItem item, FilterMode.TagFilter filter) {
