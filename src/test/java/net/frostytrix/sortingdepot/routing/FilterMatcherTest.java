@@ -37,19 +37,49 @@ class FilterMatcherTest {
 
         @Test
         void matchesWhenIdIsOneOfSeveral() {
-            var filter = new FilterMode.ItemFilter(Set.of("minecraft:oak_log", "minecraft:birch_log"));
+            var filter = new FilterMode.ItemFilter(Set.of("minecraft:oak_log", "minecraft:birch_log"), false);
             assertTrue(FilterMatcher.matches(oakLog(), filter));
         }
 
         @Test
         void rejectsWhenIdNotInSet() {
-            var filter = new FilterMode.ItemFilter(Set.of("minecraft:birch_log", "minecraft:spruce_log"));
+            var filter = new FilterMode.ItemFilter(Set.of("minecraft:birch_log", "minecraft:spruce_log"), false);
             assertFalse(FilterMatcher.matches(oakLog(), filter));
         }
 
         @Test
         void emptySetMatchesNothing() {
-            assertFalse(FilterMatcher.matches(oakLog(), new FilterMode.ItemFilter(Set.of())));
+            assertFalse(FilterMatcher.matches(oakLog(), new FilterMode.ItemFilter(Set.of(), false)));
+        }
+
+        @Test
+        void strictMatchesOnlyWhenComponentsMatch() {
+            var sharp5 = new RoutableItem("minecraft:diamond_sword", 1, Set.of(), "{sharpness:5}");
+            var plain = new RoutableItem("minecraft:diamond_sword", 1, Set.of(), null);
+            var filter = new FilterMode.ItemFilter(Set.of(sharp5.strictKey()), true);
+            assertTrue(FilterMatcher.matches(sharp5, filter));
+            assertFalse(FilterMatcher.matches(plain, filter)); // same item, different components
+        }
+    }
+
+    @Nested
+    @DisplayName("ModFilter")
+    class ModMode {
+
+        @Test
+        void matchesItemsInTheNamespace() {
+            var create = new RoutableItem("create:cogwheel", 1, Set.of(), null);
+            assertTrue(FilterMatcher.matches(create, new FilterMode.ModFilter(Set.of("create"))));
+        }
+
+        @Test
+        void rejectsItemsFromOtherNamespaces() {
+            assertFalse(FilterMatcher.matches(oakLog(), new FilterMode.ModFilter(Set.of("create"))));
+        }
+
+        @Test
+        void matchesAnyOfSeveralNamespaces() {
+            assertTrue(FilterMatcher.matches(oakLog(), new FilterMode.ModFilter(Set.of("create", "minecraft"))));
         }
     }
 

@@ -1,6 +1,7 @@
 package net.frostytrix.sortingdepot.gui;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import net.frostytrix.sortingdepot.item.FilterCardItem;
 import net.frostytrix.sortingdepot.item.component.FilterCardData;
@@ -15,25 +16,26 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * Configuration screen for a held Filter Card. Self-drawn (no background texture required): a panel,
- * three mode buttons, a row of five ghost slots showing the chosen items, and — in Tag mode — a scrolling
- * checklist of the tags those items belong to. Clicking an inventory item adds it; clicking a ghost slot
- * removes it; clicking a tag toggles it. All edits go to the server via {@link FilterCardMenu}'s buttons.
+ * Configuration screen for a held Filter Card. Self-drawn (no background texture required): a panel, four
+ * mode buttons (Item / Mod / Tag / Any), a row of five ghost slots showing the chosen items, and a
+ * mode-specific area below — a strict-NBT toggle in Item mode, the matched namespaces in Mod mode, or a
+ * scrolling tag checklist in Tag mode. Click an inventory item to add it; click a ghost slot to remove it.
+ * All edits go to the server via {@link FilterCardMenu}'s buttons.
  */
 public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
 
     // Layout (relative to leftPos/topPos).
     private static final int MODE_Y = 20;
     private static final int MODE_H = 16;
-    private static final int[] MODE_X = {8, 60, 112};
-    private static final int MODE_W = 50;
+    private static final int[] MODE_X = {8, 50, 92, 134};
+    private static final int MODE_W = 39;
 
     private static final int GHOST_Y = 42;
     private static final int GHOST_X = 8;
     private static final int SLOT = 18;
 
-    private static final int TAGS_COUNT_Y = 63; // "Tags x/3" line, between ghost slots and the list
-    private static final int TAG_Y = 76;
+    private static final int DETAIL_Y = 64; // strict toggle (Item) / namespaces (Mod) / tag count (Tag)
+    private static final int TAG_Y = 78;
     private static final int TAG_ROW_H = 12;
     private static final int TAG_VISIBLE = 4;
     private static final int TAG_TEXT_X = 24; // where a tag row's name starts (after its checkbox)
@@ -87,31 +89,52 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
         FilterCardData.Mode mode = d.mode();
 
         // Mode buttons.
-        drawButton(graphics, x + MODE_X[0], y + MODE_Y, modeLabel("item"), mode == FilterCardData.Mode.ITEM);
-        drawButton(graphics, x + MODE_X[1], y + MODE_Y, modeLabel("tag"), mode == FilterCardData.Mode.TAG);
-        drawButton(graphics, x + MODE_X[2], y + MODE_Y, modeLabel("overflow"), mode == FilterCardData.Mode.OVERFLOW);
+        drawButton(graphics, x + MODE_X[0], y + MODE_Y, btnLabel("item"), mode == FilterCardData.Mode.ITEM);
+        drawButton(graphics, x + MODE_X[1], y + MODE_Y, btnLabel("mod"), mode == FilterCardData.Mode.MOD);
+        drawButton(graphics, x + MODE_X[2], y + MODE_Y, btnLabel("tag"), mode == FilterCardData.Mode.TAG);
+        drawButton(graphics, x + MODE_X[3], y + MODE_Y, btnLabel("any"), mode == FilterCardData.Mode.OVERFLOW);
 
         if (mode == FilterCardData.Mode.OVERFLOW) {
             graphics.centeredText(font, Component.translatable("gui.frostyssortingdepot.filter_card.overflow"),
                     x + imageWidth / 2, y + GHOST_Y + 8, TEXT);
-        } else {
-            // Ghost slots showing the chosen items.
-            List<Identifier> items = d.items();
-            for (int i = 0; i < FilterCardData.MAX_ITEMS; i++) {
-                int gx = x + GHOST_X + i * SLOT;
-                drawSlot(graphics, gx, y + GHOST_Y);
-                if (i < items.size()) {
-                    ItemStack icon = new ItemStack(BuiltInRegistries.ITEM.getValue(items.get(i)));
-                    graphics.item(icon, gx + 1, y + GHOST_Y + 1);
-                }
-            }
+            return;
+        }
 
-            if (mode == FilterCardData.Mode.ITEM) {
-                graphics.text(font, Component.translatable("gui.frostyssortingdepot.filter_card.add_items",
-                        items.size(), FilterCardData.MAX_ITEMS), x + 8, y + GHOST_Y + SLOT + 4, TEXT, false);
-            } else {
-                drawTagList(graphics, x, y, d, mouseX, mouseY);
+        // Ghost slots showing the chosen reference items (shared by Item/Mod/Tag).
+        List<ItemStack> items = d.items();
+        for (int i = 0; i < FilterCardData.MAX_ITEMS; i++) {
+            int gx = x + GHOST_X + i * SLOT;
+            drawSlot(graphics, gx, y + GHOST_Y);
+            if (i < items.size()) {
+                graphics.item(items.get(i), gx + 1, y + GHOST_Y + 1);
             }
+        }
+
+        switch (mode) {
+            case ITEM -> {
+                // Strict-NBT checkbox.
+                int cy = y + DETAIL_Y;
+                graphics.fill(x + 10, cy, x + 20, cy + 10, SLOT_INNER);
+                if (d.strict()) {
+                    graphics.fill(x + 12, cy + 2, x + 18, cy + 8, CHECK_ON);
+                }
+                graphics.text(font, Component.translatable("gui.frostyssortingdepot.filter_card.strict"),
+                        x + 24, cy + 1, TEXT, false);
+                graphics.text(font, Component.translatable("gui.frostyssortingdepot.filter_card.add_items",
+                        items.size(), FilterCardData.MAX_ITEMS), x + 8, y + DETAIL_Y + 14, TEXT, false);
+            }
+            case MOD -> {
+                String mods = items.stream()
+                        .map(s -> BuiltInRegistries.ITEM.getKey(s.getItem()).getNamespace())
+                        .distinct().collect(Collectors.joining(", "));
+                Component line = mods.isEmpty()
+                        ? Component.translatable("gui.frostyssortingdepot.filter_card.no_mods")
+                        : Component.translatable("gui.frostyssortingdepot.filter_card.mods",
+                                fitWidth(mods, imageWidth - 40));
+                graphics.text(font, line, x + 8, y + DETAIL_Y, TEXT, false);
+            }
+            case TAG -> drawTagList(graphics, x, y, d, mouseX, mouseY);
+            default -> { }
         }
     }
 
@@ -119,13 +142,13 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
         List<Identifier> tags = FilterCardMenu.displayedTags(d.items(), d.tags());
         if (tags.isEmpty()) {
             graphics.text(font, Component.translatable("gui.frostyssortingdepot.filter_card.no_tags"),
-                    x + 8, y + TAG_Y, TEXT, false);
+                    x + 8, y + DETAIL_Y, TEXT, false);
             return;
         }
         graphics.text(font, Component.translatable("gui.frostyssortingdepot.filter_card.tags",
-                d.tags().size(), FilterCardData.MAX_TAGS), x + 8, y + TAGS_COUNT_Y, TEXT, false);
+                d.tags().size(), FilterCardData.MAX_TAGS), x + 8, y + DETAIL_Y, TEXT, false);
         if (tags.size() > TAG_VISIBLE) {
-            graphics.text(font, Component.literal("▲▼"), x + imageWidth - 22, y + TAGS_COUNT_Y, TEXT, false);
+            graphics.text(font, Component.literal("▲▼"), x + imageWidth - 22, y + DETAIL_Y, TEXT, false);
         }
 
         int maxTextWidth = imageWidth - TAG_TEXT_X - 6;
@@ -162,8 +185,8 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
         graphics.fill(sx + 1, sy + 1, sx + SLOT - 1, sy + SLOT - 1, SLOT_INNER);
     }
 
-    private static Component modeLabel(String mode) {
-        return Component.translatable("item.frostyssortingdepot.filter_card.mode." + mode);
+    private static Component btnLabel(String key) {
+        return Component.translatable("gui.frostyssortingdepot.filter_card.btn." + key);
     }
 
     @Override
@@ -186,13 +209,20 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
                 return click(FilterCardMenu.BTN_MODE_ITEM);
             }
             if (inRect(rx, ry, MODE_X[1], MODE_Y, MODE_W, MODE_H)) {
-                return click(FilterCardMenu.BTN_MODE_TAG);
+                return click(FilterCardMenu.BTN_MODE_MOD);
             }
             if (inRect(rx, ry, MODE_X[2], MODE_Y, MODE_W, MODE_H)) {
+                return click(FilterCardMenu.BTN_MODE_TAG);
+            }
+            if (inRect(rx, ry, MODE_X[3], MODE_Y, MODE_W, MODE_H)) {
                 return click(FilterCardMenu.BTN_MODE_OVERFLOW);
             }
 
             if (mode != FilterCardData.Mode.OVERFLOW) {
+                // Strict toggle (Item mode only).
+                if (mode == FilterCardData.Mode.ITEM && inRect(rx, ry, 10, DETAIL_Y, 120, 10)) {
+                    return click(FilterCardMenu.BTN_TOGGLE_STRICT);
+                }
                 // Ghost-slot removal.
                 for (int i = 0; i < FilterCardData.MAX_ITEMS; i++) {
                     if (inRect(rx, ry, GHOST_X + i * SLOT, GHOST_Y, SLOT, SLOT)) {

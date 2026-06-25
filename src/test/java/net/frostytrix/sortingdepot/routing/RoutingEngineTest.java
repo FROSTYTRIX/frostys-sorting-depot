@@ -92,4 +92,43 @@ class RoutingEngineTest {
                 new Candidate(new FilterMode.TagFilter(Set.of("minecraft:logs")), 3, true));
         assertEquals(0, RoutingEngine.chooseTarget(oakLog(), candidates));
     }
+
+    @Test
+    void roundRobinRotatesAmongEqualPriorityDestinations() {
+        var candidates = List.of(
+                accepts("minecraft:oak_log", 3, true),
+                accepts("minecraft:oak_log", 3, true),
+                accepts("minecraft:oak_log", 3, true));
+        assertEquals(0, RoutingEngine.chooseRoundRobin(oakLog(), candidates, 0));
+        assertEquals(1, RoutingEngine.chooseRoundRobin(oakLog(), candidates, 1));
+        assertEquals(2, RoutingEngine.chooseRoundRobin(oakLog(), candidates, 2));
+        assertEquals(0, RoutingEngine.chooseRoundRobin(oakLog(), candidates, 3)); // wraps
+    }
+
+    @Test
+    void roundRobinStaysWithinTheHighestPriorityTier() {
+        // Two priority-5 destinations and a priority-2; rotation must never pick the lower tier.
+        var candidates = List.of(
+                accepts("minecraft:oak_log", 5, true),
+                accepts("minecraft:oak_log", 2, true),
+                accepts("minecraft:oak_log", 5, true));
+        assertEquals(0, RoutingEngine.chooseRoundRobin(oakLog(), candidates, 0));
+        assertEquals(2, RoutingEngine.chooseRoundRobin(oakLog(), candidates, 1));
+        assertEquals(0, RoutingEngine.chooseRoundRobin(oakLog(), candidates, 2)); // wraps within the 5-tier
+    }
+
+    @Test
+    void roundRobinSkipsFullDestinations() {
+        var candidates = List.of(
+                accepts("minecraft:oak_log", 3, false),
+                accepts("minecraft:oak_log", 3, true));
+        assertEquals(1, RoutingEngine.chooseRoundRobin(oakLog(), candidates, 0));
+        assertEquals(1, RoutingEngine.chooseRoundRobin(oakLog(), candidates, 1));
+    }
+
+    @Test
+    void roundRobinYieldsNoTargetWhenNoneAccept() {
+        var candidates = List.of(accepts("minecraft:stone", 3, true));
+        assertEquals(RoutingEngine.NO_TARGET, RoutingEngine.chooseRoundRobin(oakLog(), candidates, 0));
+    }
 }
