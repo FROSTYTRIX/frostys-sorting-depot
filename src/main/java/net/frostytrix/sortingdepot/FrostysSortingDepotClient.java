@@ -1,6 +1,7 @@
 package net.frostytrix.sortingdepot;
 
 import net.frostytrix.sortingdepot.client.OverflowChestRenderer;
+import net.frostytrix.sortingdepot.client.SDLinkerBeams;
 import net.frostytrix.sortingdepot.gui.DepotControllerScreen;
 import net.frostytrix.sortingdepot.gui.DepotTerminalScreen;
 import net.frostytrix.sortingdepot.gui.FilterCardScreen;
@@ -14,11 +15,16 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(value = FrostysSortingDepot.MOD_ID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = FrostysSortingDepot.MOD_ID, value = Dist.CLIENT)
 public class FrostysSortingDepotClient {
     public FrostysSortingDepotClient(ModContainer container) {
+        // World-overlay beams render on the game bus, not the mod bus.
+        NeoForge.EVENT_BUS.addListener(
+                (RenderLevelStageEvent.AfterTranslucentBlocks event) -> SDLinkerBeams.onRenderLevelStage(event));
     }
 
     @SubscribeEvent
