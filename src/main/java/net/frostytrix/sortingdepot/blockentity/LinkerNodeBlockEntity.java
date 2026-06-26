@@ -71,13 +71,22 @@ public class LinkerNodeBlockEntity extends BlockEntity {
         return null;
     }
 
-    /** The item capability of the inventory this node faces, or {@code null} if there is none. */
+    /**
+     * The item capability of the inventory this node faces, or {@code null} if there is none. If the
+     * server-side {@code validDestinationTag} whitelist is set, the target block must be in that tag
+     * — otherwise this returns {@code null} and routing skips this destination. Lets pack admins keep
+     * items out of hoppers/pipes by accident.
+     */
     public @Nullable IItemHandler getTargetHandler() {
         if (level == null) {
             return null;
         }
         Direction facing = getBlockState().getValue(LinkerNodeBlock.FACING);
         BlockPos targetPos = worldPosition.relative(facing);
+        var tag = net.frostytrix.sortingdepot.CommonConfig.validDestinationTag();
+        if (tag.isPresent() && !level.getBlockState(targetPos).is(tag.get())) {
+            return null;
+        }
         return level.getCapability(Capabilities.ItemHandler.BLOCK, targetPos, facing.getOpposite());
     }
 

@@ -49,10 +49,13 @@ public class LinkerItem extends Item {
         if (be instanceof DepotControllerBlockEntity controller) {
             BlockPos selected = linkedPos(stack);
             if (selected != null && level.getBlockEntity(selected) instanceof LinkerNodeBlockEntity node) {
-                controller.addLinker(selected);
-                node.setControllerPos(clicked.immutable());
-                stack.remove(SDDataComponents.LINKED_POS.get());
-                message(player, "item.frostyssortingdepot.linker.registered");
+                if (controller.addLinker(selected)) {
+                    node.setControllerPos(clicked.immutable());
+                    stack.remove(SDDataComponents.LINKED_POS.get());
+                    message(player, "item.frostyssortingdepot.linker.registered");
+                } else {
+                    message(player, "item.frostyssortingdepot.linker.network_full");
+                }
             } else {
                 message(player, "item.frostyssortingdepot.linker.no_selection");
             }
