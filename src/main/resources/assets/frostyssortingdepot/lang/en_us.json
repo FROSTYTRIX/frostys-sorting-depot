@@ -24,6 +24,7 @@
   "item.frostyssortingdepot.linker.stored": "Selected Linker Node [%s, %s, %s]",
   "item.frostyssortingdepot.linker.registered": "Linker Node registered to Controller",
   "item.frostyssortingdepot.linker.no_selection": "No Linker Node selected — right-click one first",
+  "item.frostyssortingdepot.linker.network_full": "This Controller's network is full",
 
   "block.frostyssortingdepot.linker_node": "Linker Node",
   "block.frostyssortingdepot.depot_controller": "Depot Controller",
@@ -71,6 +72,18 @@
   "frostyssortingdepot.configuration.title": "Frosty's Sorting Depot",
   "frostyssortingdepot.configuration.section.frostyssortingdepot.client.toml": "Client Settings",
   "frostyssortingdepot.configuration.section.frostyssortingdepot.client.toml.title": "Client Settings",
+  "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml": "Server Settings",
+  "frostyssortingdepot.configuration.section.frostyssortingdepot.common.toml.title": "Server Settings",
+
+  "frostyssortingdepot.configuration.controller": "Depot Controller",
+  "frostyssortingdepot.configuration.controller.transferCooldown": "Transfer Cooldown",
+  "frostyssortingdepot.configuration.controller.transferCooldown.tooltip": "Ticks between Controller transfer cycles. Lower is faster; a vanilla hopper uses 8. The default of 2 is roughly 4× a hopper.",
+  "frostyssortingdepot.configuration.controller.batchSize": "Batch Size",
+  "frostyssortingdepot.configuration.controller.batchSize.tooltip": "How many items the Controller can move per cycle. 1 matches hopper feel; raise for heavy throughput in modpacks.",
+  "frostyssortingdepot.configuration.controller.maxNetworkSize": "Max Network Size",
+  "frostyssortingdepot.configuration.controller.maxNetworkSize.tooltip": "Hard cap on the number of Linker Nodes a single Controller can have registered.",
+  "frostyssortingdepot.configuration.controller.validDestinationTag": "Valid Destination Tag",
+  "frostyssortingdepot.configuration.controller.validDestinationTag.tooltip": "Optional block tag (e.g. \"c:chests\"). When non-empty, Linker Nodes only route into blocks in this tag. Leave empty to allow any block with an item-handler.",
 
   "frostyssortingdepot.configuration.linkerBeam": "Linker Beam",
   "frostyssortingdepot.configuration.linkerBeam.show": "Show Beam",
