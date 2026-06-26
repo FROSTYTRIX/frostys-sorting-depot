@@ -1,5 +1,5 @@
 {
-  "parent": "frostyssortingdepot:sorting_depot/root",
+  "parent": "frostyssortingdepot:sorting_depot/overflow",
   "criteria": {
     "has_item": {
       "conditions": {
