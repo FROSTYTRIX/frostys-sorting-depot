@@ -30,9 +30,9 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
     private static final int[] MODE_X = {8, 50, 92, 134};
     private static final int MODE_W = 39;
 
-    private static final int GHOST_Y = 42;
-    private static final int GHOST_X = 8;
-    private static final int SLOT = 18;
+    public static final int GHOST_Y = 42;
+    public static final int GHOST_X = 8;
+    public static final int SLOT = 18;
 
     private static final int DETAIL_Y = 64; // strict toggle (Item) / namespaces (Mod) / tag count (Tag)
     private static final int TAG_Y = 78;
