@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import net.frostytrix.sortingdepot.CommonConfig;
 import net.frostytrix.sortingdepot.registry.SDBlockEntities;
 import net.frostytrix.sortingdepot.routing.FilterMode;
 import net.frostytrix.sortingdepot.routing.RoutableItem;
@@ -86,13 +87,22 @@ public class DepotControllerBlockEntity extends BlockEntity {
         return Mth.floor(fill * 14.0F) + 1;
     }
 
-    public void addLinker(BlockPos pos) {
+    /**
+     * Registers a new Linker Node. Refuses (returns {@code false}) when the network is already at the
+     * configured cap so a misconfigured pack can't grow unbounded networks.
+     */
+    public boolean addLinker(BlockPos pos) {
         BlockPos immutable = pos.immutable();
-        if (!linkers.contains(immutable)) {
-            linkers.add(immutable);
-            setChanged();
-            syncToClient();
+        if (linkers.contains(immutable)) {
+            return true; // already registered, treat as success
         }
+        if (linkers.size() >= CommonConfig.MAX_NETWORK_SIZE.get()) {
+            return false;
+        }
+        linkers.add(immutable);
+        setChanged();
+        syncToClient();
+        return true;
     }
 
     public void removeLinker(BlockPos pos) {
@@ -115,9 +125,6 @@ public class DepotControllerBlockEntity extends BlockEntity {
 
     // --- ticking / routing ---------------------------------------------------------------------
 
-    /** Ticks between transfers — a hopper is 8, so this is roughly four times a hopper's throughput. */
-    private static final int TRANSFER_COOLDOWN = 2;
-
     private int transferCooldown;
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, DepotControllerBlockEntity be) {
@@ -125,10 +132,11 @@ public class DepotControllerBlockEntity extends BlockEntity {
             be.transferCooldown--;
             return;
         }
-        // Hopper-style cadence: pull one item from above into the buffer, then route one item out.
-        be.transferCooldown = TRANSFER_COOLDOWN;
+        // Hopper-style cadence: pull one item from above into the buffer, then route a configurable
+        // number of items out. Both knobs come from CommonConfig so server admins can tune throughput.
+        be.transferCooldown = CommonConfig.TRANSFER_COOLDOWN.get();
         be.pullFromAbove(level);
-        be.route(level, 1);
+        be.route(level, CommonConfig.BATCH_SIZE.get());
     }
 
     /** Pulls a single item from an inventory directly above into the input buffer (hopper-style). */

@@ -15,6 +15,7 @@ import net.frostytrix.sortingdepot.registry.SDMenus;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 
 @Mod(FrostysSortingDepot.MOD_ID)
 public class FrostysSortingDepot {
@@ -23,6 +24,9 @@ public class FrostysSortingDepot {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public FrostysSortingDepot(IEventBus modEventBus, ModContainer modContainer) {
+        // Server-side tunables (transfer rate, batch size, max network size, destination tag).
+        modContainer.registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC);
+
         // Data components must exist for items to reference them, so register them first.
         SDDataComponents.register(modEventBus);
         SDBlocks.register(modEventBus);

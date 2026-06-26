@@ -24,6 +24,7 @@
   "item.frostyssortingdepot.linker.stored": "Nœud de connexion sélectionné [%s, %s, %s]",
   "item.frostyssortingdepot.linker.registered": "Nœud enregistré dans le Contrôleur",
   "item.frostyssortingdepot.linker.no_selection": "Aucun nœud sélectionné — clic droit sur un nœud d'abord",
+  "item.frostyssortingdepot.linker.network_full": "Le réseau de ce Contrôleur est plein",
 
   "block.frostyssortingdepot.linker_node": "Nœud de connexion",
   "block.frostyssortingdepot.depot_controller": "Contrôleur de Dépôt",
