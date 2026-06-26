@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "frostyssortingdepot:overflow_chest"
+            "items": "frostyssortingdepot:priority_stamp"
           }
         ]
       },
@@ -14,14 +14,14 @@
   },
   "display": {
     "description": {
-      "translate": "advancements.frostyssortingdepot.overflow.description"
+      "translate": "advancements.frostyssortingdepot.priority.description"
     },
     "icon": {
       "count": 1,
-      "id": "frostyssortingdepot:overflow_chest"
+      "id": "frostyssortingdepot:priority_stamp"
     },
     "title": {
-      "translate": "advancements.frostyssortingdepot.overflow.title"
+      "translate": "advancements.frostyssortingdepot.priority.title"
     }
   },
   "requirements": [
