@@ -31,7 +31,13 @@ sourceSets.main.resources {
 repositories {
     // Maven Central provides JUnit (and any other plain-Java test/util libs).
     mavenCentral()
-    // Add here additional repositories if required by some of the dependencies below.
+    // JEI for the optional recipe-viewer integration (ghost-slot drag onto Filter Cards).
+    maven {
+        url = "https://maven.blamejared.com"
+        content {
+            includeGroup("mezz.jei")
+        }
+    }
 }
 
 base {
@@ -138,6 +144,13 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+    // JEI — soft dependency for the ghost-slot drag integration on the Filter Card screen. The API
+    // artifact is compile-time only (the mod loads fine without JEI installed); the full mod is added
+    // to localRuntime so we get it in runClient without forcing it on downstream consumers.
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+    localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 
     // JUnit 5 for the pure-logic unit tests (routing package). These never touch Minecraft.
     testImplementation platform("org.junit:junit-bom:5.11.4")

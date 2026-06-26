@@ -1,6 +1,6 @@
 # Frosty's Sorting Depot — Documentation
 
-This is the long-form companion to the [README](README.md). If you just want to start
+This is the long-form companion to the [README](../README.md). If you just want to start
 sorting items, the **[Quick start](#quick-start)** section at the top of the README is
 all you need. Read on for the full reference.
 
