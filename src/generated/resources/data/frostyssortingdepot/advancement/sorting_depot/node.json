@@ -1,11 +1,11 @@
 {
-  "parent": "frostyssortingdepot:sorting_depot/filter",
+  "parent": "frostyssortingdepot:sorting_depot/root",
   "criteria": {
     "has_item": {
       "conditions": {
         "items": [
           {
-            "items": "frostyssortingdepot:overflow_chest"
+            "items": "frostyssortingdepot:linker_node"
           }
         ]
       },
@@ -14,14 +14,14 @@
   },
   "display": {
     "description": {
-      "translate": "advancements.frostyssortingdepot.overflow.description"
+      "translate": "advancements.frostyssortingdepot.node.description"
     },
     "icon": {
       "count": 1,
-      "id": "frostyssortingdepot:overflow_chest"
+      "id": "frostyssortingdepot:linker_node"
     },
     "title": {
-      "translate": "advancements.frostyssortingdepot.overflow.title"
+      "translate": "advancements.frostyssortingdepot.node.title"
     }
   },
   "requirements": [
