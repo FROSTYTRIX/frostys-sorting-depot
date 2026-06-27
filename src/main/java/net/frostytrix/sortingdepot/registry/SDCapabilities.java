@@ -25,6 +25,8 @@ public final class SDCapabilities {
         event.registerBlockEntity(
                 Capabilities.Item.BLOCK,
                 SDBlockEntities.OVERFLOW_CHEST.get(),
-                (be, side) -> VanillaContainerWrapper.of(be));
+                // Wrap the *full* chest container so a double Overflow Chest exposes both halves
+                // (the BE itself is just one half).
+                (be, side) -> VanillaContainerWrapper.of(be.fullContainer()));
     }
 }

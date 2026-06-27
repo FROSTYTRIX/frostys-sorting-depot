@@ -108,7 +108,7 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
     private static @Nullable ResourceHandler<ItemResource> adjacentOverflow(Level level, BlockPos controllerPos) {
         for (Direction direction : Direction.values()) {
             if (level.getBlockEntity(controllerPos.relative(direction)) instanceof OverflowChestBlockEntity overflow) {
-                return VanillaContainerWrapper.of(overflow);
+                return VanillaContainerWrapper.of(overflow.fullContainer());
             }
         }
         return null;
