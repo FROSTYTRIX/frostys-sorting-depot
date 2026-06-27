@@ -222,7 +222,7 @@ public class DepotControllerBlockEntity extends BlockEntity {
     private @Nullable IItemHandler findOverflow(Level level) {
         for (Direction direction : Direction.values()) {
             if (level.getBlockEntity(worldPosition.relative(direction)) instanceof OverflowChestBlockEntity overflow) {
-                return new InvWrapper(overflow);
+                return new InvWrapper(overflow.fullContainer());
             }
         }
         return null;
