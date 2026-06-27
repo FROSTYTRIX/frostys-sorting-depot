@@ -176,8 +176,7 @@ Controller.
 - It's a **real chest**: double-able, animated lid, vanilla chest GUI. The renderer uses
   the mod's custom chest texture.
 - It must be **adjacent** to its Controller (any of the six faces).
-- A **double** Overflow Chest currently exposes only one half to routing — single chests
-  recommended for now.
+- Double Overflow Chests are fully supported — both halves are exposed to routing.
 
 ---
 
