@@ -1,14 +1,18 @@
 package net.frostytrix.sortingdepot.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.frostytrix.sortingdepot.Config;
+import net.frostytrix.sortingdepot.FrostysSortingDepot;
 import net.frostytrix.sortingdepot.blockentity.DepotControllerBlockEntity;
 import net.frostytrix.sortingdepot.item.LinkerItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -17,21 +21,33 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.pipeline.PipelineModifier;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Client-only world overlay drawn while the player holds a Linker (1.21.x immediate-mode line rendering,
- * via {@link RenderType#lines()} at {@code AFTER_TRANSLUCENT_BLOCKS}):
+ * Client-only world overlay drawn at {@code AFTER_TRANSLUCENT_BLOCKS} using 1.21.x immediate-mode lines
+ * via {@link RenderType#lines()}:
  * <ul>
- *   <li>the Linker's selected node is outlined with a short vertical beam (if enabled);</li>
- *   <li>optionally, a wire from every nearby Controller to each of its linked nodes (toggle/keybind).</li>
+ *   <li>(while holding a Linker) the selected node is outlined with a short vertical beam;</li>
+ *   <li>(while holding a Linker, off by default) a wire from every nearby Controller to each linked node;</li>
+ *   <li>(triggered by clicking a row in the Depot Terminal) a transient outline around the corresponding
+ *       Linker Node, drawn through walls via a NeoForge pipeline modifier that disables depth-testing.</li>
  * </ul>
- * Colour/toggles come from the client {@link Config}. (Line width is fixed by {@code RenderType.lines}
- * on 1.21.x, so the width settings only take effect on 26.2.)
+ * Colour/toggles come from the client {@link Config}. Line widths are fixed by {@code RenderType.lines}
+ * on 1.21.x, so the width settings only take effect on 26.2.
  */
 public final class SDLinkerBeams {
 
     private static final int WIRING_CHUNK_RADIUS = 4;
+
+    /**
+     * NeoForge pipeline-modifier key: strips depth-testing from any pipeline used inside a
+     * {@link RenderSystem#renderWithPipelineModifier} block. Used so the Terminal click-to-highlight
+     * outline renders through blocks. Registered in {@code FrostysSortingDepotClient}.
+     */
+    public static final ResourceKey<PipelineModifier> NO_DEPTH_MODIFIER = ResourceKey.create(
+            PipelineModifier.MODIFIERS_KEY,
+            ResourceLocation.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, "no_depth"));
 
     /** Session override for the wiring overlay: {@code null} = use the config default. Toggled by keybind. */
     private static Boolean wiringOverride;
@@ -77,12 +93,13 @@ public final class SDLinkerBeams {
         Vec3 cam = event.getCamera().getPosition();
         PoseStack poseStack = event.getPoseStack();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
-        VertexConsumer vc = buffers.getBuffer(RenderType.lines());
 
         poseStack.pushPose();
         poseStack.translate(-cam.x, -cam.y, -cam.z);
         PoseStack.Pose pose = poseStack.last();
 
+        // Normal (depth-tested) pass: held-linker beam + wiring.
+        VertexConsumer vc = buffers.getBuffer(RenderType.lines());
         if (holdsLinker && Config.SHOW_BEAM.get()) {
             BlockPos selected = selectedNode(mc.player);
             if (selected != null) {
@@ -91,19 +108,24 @@ public final class SDLinkerBeams {
                 line(vc, pose, base, base.add(0.0, 2.5, 0.0), color);
             }
         }
-        if (activeHighlight != null) {
-            // 1.21.x: RenderType.lines() uses depth testing, so the highlight does NOT render through
-            // blocks. Documented as a per-version caveat (the same as the beam line-width settings).
-            box(vc, pose, new AABB(activeHighlight), color);
-            Vec3 base = Vec3.atCenterOf(activeHighlight);
-            line(vc, pose, base, base.add(0.0, 2.5, 0.0), color);
-        }
         if (holdsLinker && wiringActive()) {
             drawWiring(mc, vc, pose, color);
         }
+        buffers.endBatch(RenderType.lines());
+
+        // X-ray pass for the Terminal click-to-highlight outline.
+        if (activeHighlight != null) {
+            BlockPos hl = activeHighlight;
+            RenderSystem.renderWithPipelineModifier(NO_DEPTH_MODIFIER, () -> {
+                VertexConsumer xrayVc = buffers.getBuffer(RenderType.lines());
+                box(xrayVc, pose, new AABB(hl), color);
+                Vec3 base = Vec3.atCenterOf(hl);
+                line(xrayVc, pose, base, base.add(0.0, 2.5, 0.0), color);
+                buffers.endBatch(RenderType.lines());
+            });
+        }
 
         poseStack.popPose();
-        buffers.endBatch(RenderType.lines());
     }
 
     private static void drawWiring(Minecraft mc, VertexConsumer vc, PoseStack.Pose pose, int color) {
