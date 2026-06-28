@@ -32,8 +32,12 @@ import org.jetbrains.annotations.Nullable;
  */
 public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int overflowFill, int inputCount) {
 
-    /** One registered destination: the inventory it serves, its filter, and how full it is (slot %). */
-    public record Entry(String target, String filter, int fill) {
+    /**
+     * One registered destination: the inventory it serves, its filter, how full it is (slot %), and the
+     * Linker Node's own {@link BlockPos} (used by the Terminal's click-to-highlight feature to point the
+     * player at the right node in-world).
+     */
+    public record Entry(BlockPos pos, String target, String filter, int fill) {
     }
 
     public static TerminalSnapshot empty() {
@@ -46,7 +50,7 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
         List<Entry> entries = new ArrayList<>();
         for (BlockPos pos : controller.getLinkers()) {
             if (level.getBlockEntity(pos) instanceof LinkerNodeBlockEntity node) {
-                entries.add(new Entry(targetName(level, node), describeFilter(node.getFilterCard()),
+                entries.add(new Entry(pos, targetName(level, node), describeFilter(node.getFilterCard()),
                         fillPercent(node.getTargetHandler())));
             }
         }
@@ -117,6 +121,7 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
     public void write(RegistryFriendlyByteBuf buf) {
         buf.writeVarInt(linkers.size());
         for (Entry entry : linkers) {
+            buf.writeBlockPos(entry.pos());
             buf.writeUtf(entry.target());
             buf.writeUtf(entry.filter());
             buf.writeVarInt(entry.fill());
@@ -130,7 +135,7 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
         int count = buf.readVarInt();
         List<Entry> entries = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
-            entries.add(new Entry(buf.readUtf(), buf.readUtf(), buf.readVarInt()));
+            entries.add(new Entry(buf.readBlockPos(), buf.readUtf(), buf.readUtf(), buf.readVarInt()));
         }
         return new TerminalSnapshot(entries, buf.readBoolean(), buf.readVarInt(), buf.readVarInt());
     }
