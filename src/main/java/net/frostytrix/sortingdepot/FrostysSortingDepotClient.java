@@ -1,8 +1,11 @@
 package net.frostytrix.sortingdepot;
 
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.platform.DepthTestFunction;
 import net.frostytrix.sortingdepot.client.OverflowChestRenderer;
 import net.frostytrix.sortingdepot.client.SDKeyMappings;
 import net.frostytrix.sortingdepot.client.SDLinkerBeams;
+import net.neoforged.neoforge.client.pipeline.RegisterPipelineModifiersEvent;
 import net.frostytrix.sortingdepot.gui.DepotControllerScreen;
 import net.frostytrix.sortingdepot.gui.DepotTerminalScreen;
 import net.frostytrix.sortingdepot.gui.FilterCardScreen;
@@ -70,5 +73,21 @@ public class FrostysSortingDepotClient {
     @SubscribeEvent
     static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(SDBlockEntities.OVERFLOW_CHEST.get(), OverflowChestRenderer::new);
+    }
+
+    /**
+     * Registers a render-pipeline modifier that strips depth-testing from whichever pipeline is in use.
+     * Wrapping a render block in {@code RenderSystem.renderWithPipelineModifier(SDLinkerBeams.NO_DEPTH_MODIFIER,
+     * ...)} makes the contents render through blocks — used for the Terminal's click-to-highlight outline so
+     * the player can spot the matching Linker Node even when it's behind walls.
+     */
+    @SubscribeEvent
+    static void registerPipelineModifiers(RegisterPipelineModifiersEvent event) {
+        event.register(SDLinkerBeams.NO_DEPTH_MODIFIER,
+                (pipeline, name) -> pipeline.toBuilder()
+                        .withLocation(name)
+                        .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+                        .withBlend(BlendFunction.TRANSLUCENT)
+                        .build());
     }
 }
