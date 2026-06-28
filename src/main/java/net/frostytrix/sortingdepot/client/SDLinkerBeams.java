@@ -36,6 +36,16 @@ public final class SDLinkerBeams {
     /** Session override for the wiring overlay: {@code null} = use the config default. Toggled by keybind. */
     private static Boolean wiringOverride;
 
+    /** Transient highlight requested by the Terminal: outline this node until {@code System.currentTimeMillis()} passes the expiry. */
+    private static @Nullable BlockPos highlightPos;
+    private static long highlightExpiresAtMillis;
+
+    /** Asks the world overlay to outline {@code pos} in cyan for {@code durationMillis}. Click-from-Terminal entry point. */
+    public static void highlight(BlockPos pos, long durationMillis) {
+        highlightPos = pos.immutable();
+        highlightExpiresAtMillis = System.currentTimeMillis() + durationMillis;
+    }
+
     private SDLinkerBeams() {
     }
 
@@ -51,12 +61,22 @@ public final class SDLinkerBeams {
 
     public static void onRenderLevelStage(RenderLevelStageEvent.AfterTranslucentBlocks event) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.level == null || !holdsLinker(mc.player)) {
+        if (mc.player == null || mc.level == null) {
             return;
         }
         int color = Config.beamColorArgb();
+        boolean holdsLinker = holdsLinker(mc.player);
+        BlockPos activeHighlight = highlightPos != null && System.currentTimeMillis() < highlightExpiresAtMillis
+                ? highlightPos
+                : null;
+        if (activeHighlight == null) {
+            highlightPos = null;
+        }
+        if (!holdsLinker && activeHighlight == null) {
+            return;
+        }
         try {
-            if (Config.SHOW_BEAM.get()) {
+            if (holdsLinker && Config.SHOW_BEAM.get()) {
                 BlockPos selected = selectedNode(mc.player);
                 if (selected != null) {
                     Gizmos.cuboid(selected, GizmoStyle.stroke(color, Config.outlineWidth()));
@@ -64,7 +84,13 @@ public final class SDLinkerBeams {
                     Gizmos.line(base, base.add(0.0, 2.5, 0.0), color, Config.beamWidth());
                 }
             }
-            if (wiringActive()) {
+            if (activeHighlight != null) {
+                // setAlwaysOnTop -> render through blocks so the user can spot the node from the Terminal.
+                Gizmos.cuboid(activeHighlight, GizmoStyle.stroke(color, Config.outlineWidth())).setAlwaysOnTop();
+                Vec3 base = Vec3.atCenterOf(activeHighlight);
+                Gizmos.line(base, base.add(0.0, 2.5, 0.0), color, Config.beamWidth()).setAlwaysOnTop();
+            }
+            if (holdsLinker && wiringActive()) {
                 drawWiring(mc, color, Config.beamWidth());
             }
         } catch (IllegalStateException noCollector) {

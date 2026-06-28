@@ -1,9 +1,15 @@
 package net.frostytrix.sortingdepot.gui;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import net.frostytrix.sortingdepot.FrostysSortingDepot;
+import net.frostytrix.sortingdepot.client.SDLinkerBeams;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -16,7 +22,9 @@ import net.minecraft.world.entity.player.Inventory;
  * Screen for the Depot Terminal: a read-only network dashboard listing each Linker Node's target,
  * filter, and fill, plus the Overflow Chest fill and the Controller's buffer count. Rows that are too
  * wide wrap onto extra lines (keeping the row's left offset, with the fill % trailing at the end); the
- * list scrolls per-entry when there are more rows than fit.
+ * list scrolls per-entry when there are more rows than fit. A search box at the top filters rows by
+ * target name OR filter text (case-insensitive substring); clicking a row briefly highlights the
+ * corresponding Linker Node in-world.
  */
 public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMenu> {
 
@@ -24,13 +32,41 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
             Identifier.fromNamespaceAndPath(FrostysSortingDepot.MOD_ID, "textures/gui/container/depot_terminal.png");
     private static final int TEXT_COLOR = 0xFF404040;
     private static final int ROW_HEIGHT = 10;
-    private static final int LIST_TOP = 18;
+    private static final int SEARCH_WIDTH = 150;
+    private static final int SEARCH_HEIGHT = 12;
+    private static final int LIST_TOP = 18 + SEARCH_HEIGHT + 2;
+    private static final int ESC_KEY = 256;
     private static final int LIST_BOTTOM_MARGIN = 36; // reserved for the overflow + buffer lines
+    private static final long HIGHLIGHT_DURATION_MS = 5_000L;
 
     private int scrollOffset; // index of the first entry shown
+    private @org.jetbrains.annotations.Nullable EditBox searchBox;
+
+    /** Per-drawn-row hit boxes (in screen space), recorded each frame so {@link #mouseClicked} can map clicks back to entries. */
+    private final List<RowHit> rowHits = new ArrayList<>();
+
+    private record RowHit(int top, int bottom, TerminalSnapshot.Entry entry) {
+    }
 
     public DepotTerminalScreen(DepotTerminalMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 200, 180);
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        int x = (this.width - this.imageWidth) / 2 + 8;
+        int y = (this.height - this.imageHeight) / 2 + 18;
+        EditBox previous = this.searchBox;
+        this.searchBox = new EditBox(this.font, x, y, SEARCH_WIDTH, SEARCH_HEIGHT,
+                Component.translatable("gui.frostyssortingdepot.terminal.search"));
+        this.searchBox.setMaxLength(48);
+        this.searchBox.setBordered(true);
+        this.searchBox.setHint(Component.translatable("gui.frostyssortingdepot.terminal.search.hint"));
+        if (previous != null) {
+            this.searchBox.setValue(previous.getValue());
+        }
+        addRenderableWidget(this.searchBox);
     }
 
     /** Bottom of the entry-drawing area; one row is held back for the scroll indicator. */
@@ -48,9 +84,26 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
         return this.font.split(Component.literal(full), rowWidth());
     }
 
+    /** Entries that pass the search filter (case-insensitive substring on target OR filter). */
+    private List<TerminalSnapshot.Entry> visibleEntries() {
+        List<TerminalSnapshot.Entry> all = this.menu.getSnapshot().linkers();
+        String query = this.searchBox == null ? "" : this.searchBox.getValue().trim().toLowerCase(Locale.ROOT);
+        if (query.isEmpty()) {
+            return all;
+        }
+        List<TerminalSnapshot.Entry> out = new ArrayList<>(all.size());
+        for (TerminalSnapshot.Entry e : all) {
+            if (e.target().toLowerCase(Locale.ROOT).contains(query)
+                    || e.filter().toLowerCase(Locale.ROOT).contains(query)) {
+                out.add(e);
+            }
+        }
+        return out;
+    }
+
     /** The largest scroll offset that still fills the list from the bottom (so every entry stays reachable). */
     private int maxScroll() {
-        List<TerminalSnapshot.Entry> linkers = this.menu.getSnapshot().linkers();
+        List<TerminalSnapshot.Entry> linkers = visibleEntries();
         int capacity = entryAreaBottom() - LIST_TOP;
         int used = 0;
         for (int i = linkers.size() - 1; i >= 0; i--) {
@@ -72,6 +125,35 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
     }
 
     @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        // Row hit-tests first: AbstractContainerScreen.mouseClicked returns true for
+        // empty-area clicks too (slot drag bookkeeping), which would swallow our row clicks.
+        if (event.button() == 0) {
+            int guiX = (this.width - this.imageWidth) / 2;
+            for (RowHit hit : rowHits) {
+                if (event.y() >= hit.top && event.y() < hit.bottom
+                        && event.x() >= guiX + 8 && event.x() < guiX + 8 + rowWidth()) {
+                    SDLinkerBeams.highlight(hit.entry.pos(), HIGHLIGHT_DURATION_MS);
+                    return true;
+                }
+            }
+        }
+        return super.mouseClicked(event, doubleClick);
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        // Keep ESC working to close. For every other key, when the search box has focus,
+        // route into it and swallow the key so the inventory-close keybind ("E" by default)
+        // doesn't fire while the user is typing.
+        if (this.searchBox != null && this.searchBox.isFocused() && event.key() != ESC_KEY) {
+            this.searchBox.keyPressed(event);
+            return true;
+        }
+        return super.keyPressed(event);
+    }
+
+    @Override
     public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         super.extractBackground(graphics, mouseX, mouseY, partialTick);
         int x = (this.width - this.imageWidth) / 2;
@@ -83,24 +165,31 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
     protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         graphics.text(this.font, this.title, this.titleLabelX, this.titleLabelY, TEXT_COLOR, false);
 
-        List<TerminalSnapshot.Entry> linkers = this.menu.getSnapshot().linkers();
+        rowHits.clear();
+        int guiY = (this.height - this.imageHeight) / 2;
+        List<TerminalSnapshot.Entry> linkers = visibleEntries();
         if (linkers.isEmpty()) {
-            graphics.text(this.font, Component.translatable("gui.frostyssortingdepot.terminal.empty"),
-                    8, LIST_TOP, TEXT_COLOR, false);
+            String key = this.menu.getSnapshot().linkers().isEmpty()
+                    ? "gui.frostyssortingdepot.terminal.empty"
+                    : "gui.frostyssortingdepot.terminal.no_match";
+            graphics.text(this.font, Component.translatable(key), 8, LIST_TOP, TEXT_COLOR, false);
         } else {
             scrollOffset = Mth.clamp(scrollOffset, 0, maxScroll());
             int bottom = entryAreaBottom();
             int y = LIST_TOP;
             int i = scrollOffset;
             for (; i < linkers.size(); i++) {
-                List<FormattedCharSequence> lines = entryLines(linkers.get(i));
-                if (y + lines.size() * ROW_HEIGHT > bottom) {
+                TerminalSnapshot.Entry entry = linkers.get(i);
+                List<FormattedCharSequence> lines = entryLines(entry);
+                int rowHeightPx = lines.size() * ROW_HEIGHT;
+                if (y + rowHeightPx > bottom) {
                     break; // next entry would overflow the list area
                 }
                 for (FormattedCharSequence line : lines) {
                     graphics.text(this.font, line, 8, y, TEXT_COLOR, false);
                     y += ROW_HEIGHT;
                 }
+                rowHits.add(new RowHit(guiY + y - rowHeightPx, guiY + y, entry));
             }
             // Scroll affordances, both arrows together below the last drawn entry.
             boolean hasAbove = scrollOffset > 0;
