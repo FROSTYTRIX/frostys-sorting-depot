@@ -36,6 +36,16 @@ public final class SDLinkerBeams {
     /** Session override for the wiring overlay: {@code null} = use the config default. Toggled by keybind. */
     private static Boolean wiringOverride;
 
+    /** Transient highlight requested by the Terminal: outline this node until {@code System.currentTimeMillis()} passes the expiry. */
+    private static @Nullable BlockPos highlightPos;
+    private static long highlightExpiresAtMillis;
+
+    /** Asks the world overlay to outline {@code pos} in cyan for {@code durationMillis}. Click-from-Terminal entry point. */
+    public static void highlight(BlockPos pos, long durationMillis) {
+        highlightPos = pos.immutable();
+        highlightExpiresAtMillis = System.currentTimeMillis() + durationMillis;
+    }
+
     private SDLinkerBeams() {
     }
 
@@ -49,10 +59,21 @@ public final class SDLinkerBeams {
 
     public static void onRenderLevelStage(RenderLevelStageEvent.AfterTranslucentBlocks event) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.level == null || !holdsLinker(mc.player)) {
+        if (mc.player == null || mc.level == null) {
             return;
         }
         int color = Config.beamColorArgb();
+        boolean holdsLinker = holdsLinker(mc.player);
+        BlockPos activeHighlight = highlightPos != null && System.currentTimeMillis() < highlightExpiresAtMillis
+                ? highlightPos
+                : null;
+        if (activeHighlight == null) {
+            highlightPos = null;
+        }
+        if (!holdsLinker && activeHighlight == null) {
+            return;
+        }
+
         Vec3 cam = event.getCamera().getPosition();
         PoseStack poseStack = event.getPoseStack();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
@@ -62,7 +83,7 @@ public final class SDLinkerBeams {
         poseStack.translate(-cam.x, -cam.y, -cam.z);
         PoseStack.Pose pose = poseStack.last();
 
-        if (Config.SHOW_BEAM.get()) {
+        if (holdsLinker && Config.SHOW_BEAM.get()) {
             BlockPos selected = selectedNode(mc.player);
             if (selected != null) {
                 box(vc, pose, new AABB(selected), color);
@@ -70,7 +91,14 @@ public final class SDLinkerBeams {
                 line(vc, pose, base, base.add(0.0, 2.5, 0.0), color);
             }
         }
-        if (wiringActive()) {
+        if (activeHighlight != null) {
+            // 1.21.x: RenderType.lines() uses depth testing, so the highlight does NOT render through
+            // blocks. Documented as a per-version caveat (the same as the beam line-width settings).
+            box(vc, pose, new AABB(activeHighlight), color);
+            Vec3 base = Vec3.atCenterOf(activeHighlight);
+            line(vc, pose, base, base.add(0.0, 2.5, 0.0), color);
+        }
+        if (holdsLinker && wiringActive()) {
             drawWiring(mc, vc, pose, color);
         }
 

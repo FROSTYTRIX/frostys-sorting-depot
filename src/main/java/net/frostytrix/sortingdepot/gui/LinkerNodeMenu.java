@@ -1,5 +1,6 @@
 package net.frostytrix.sortingdepot.gui;
 
+import net.frostytrix.sortingdepot.blockentity.DepotControllerBlockEntity;
 import net.frostytrix.sortingdepot.blockentity.LinkerNodeBlockEntity;
 import net.frostytrix.sortingdepot.registry.SDBlocks;
 import net.frostytrix.sortingdepot.registry.SDMenus;
@@ -22,6 +23,9 @@ public class LinkerNodeMenu extends AbstractContainerMenu {
 
     private static final int CARD_SLOT = 0;
     private static final int INV_START = 1;
+
+    /** Button id (via {@link #clickMenuButton}) that unlinks this node from its Controller. */
+    public static final int BTN_UNLINK = 0;
 
     private final LinkerNodeBlockEntity node;
     private final ContainerLevelAccess access;
@@ -93,6 +97,20 @@ public class LinkerNodeMenu extends AbstractContainerMenu {
     /** Whether this node is registered to a Controller (synced to the client). */
     public boolean isLinked() {
         return linked;
+    }
+
+    @Override
+    public boolean clickMenuButton(Player player, int id) {
+        if (id == BTN_UNLINK) {
+            BlockPos ctrl = node.getControllerPos();
+            if (ctrl != null && node.getLevel() != null
+                    && node.getLevel().getBlockEntity(ctrl) instanceof DepotControllerBlockEntity controller) {
+                controller.removeLinker(node.getBlockPos());
+            }
+            node.setControllerPos(null);
+            return true;
+        }
+        return false;
     }
 
     @Override

@@ -34,6 +34,7 @@
 
   "gui.frostyssortingdepot.linker_node.linked": "Linked to Controller",
   "gui.frostyssortingdepot.linker_node.unlinked": "Not linked",
+  "gui.frostyssortingdepot.linker_node.unlink": "Unlink",
 
   "gui.frostyssortingdepot.controller.first_match": "First-match",
   "gui.frostyssortingdepot.controller.round_robin": "Round-robin",
@@ -55,6 +56,9 @@
   "gui.frostyssortingdepot.filter_card.overflow": "Matches anything",
 
   "gui.frostyssortingdepot.terminal.empty": "No Linker Nodes registered",
+  "gui.frostyssortingdepot.terminal.no_match": "No nodes match your search",
+  "gui.frostyssortingdepot.terminal.search": "Search",
+  "gui.frostyssortingdepot.terminal.search.hint": "Search target or filter…",
   "gui.frostyssortingdepot.terminal.overflow": "Overflow: %s",
   "gui.frostyssortingdepot.terminal.buffer": "Buffer: %s",
 
