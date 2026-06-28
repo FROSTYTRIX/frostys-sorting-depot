@@ -34,6 +34,7 @@
 
   "gui.frostyssortingdepot.linker_node.linked": "Lié à un Contrôleur",
   "gui.frostyssortingdepot.linker_node.unlinked": "Non lié",
+  "gui.frostyssortingdepot.linker_node.unlink": "Délier",
 
   "gui.frostyssortingdepot.controller.first_match": "Premier-correspondant",
   "gui.frostyssortingdepot.controller.round_robin": "Tour de rôle",
@@ -55,6 +56,9 @@
   "gui.frostyssortingdepot.filter_card.overflow": "Accepte tout",
 
   "gui.frostyssortingdepot.terminal.empty": "Aucun nœud enregistré",
+  "gui.frostyssortingdepot.terminal.no_match": "Aucun nœud ne correspond à la recherche",
+  "gui.frostyssortingdepot.terminal.search": "Rechercher",
+  "gui.frostyssortingdepot.terminal.search.hint": "Rechercher cible ou filtre…",
   "gui.frostyssortingdepot.terminal.overflow": "Surplus : %s",
   "gui.frostyssortingdepot.terminal.buffer": "Tampon : %s",
 
