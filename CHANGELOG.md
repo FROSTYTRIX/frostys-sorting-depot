@@ -2,6 +2,34 @@
 
 All notable changes to Frosty's Sorting Depot are documented here.
 
+## 1.2.0 — 2026-06-28
+
+### Added
+- **Server-side tunables.** A new common config (`frostyssortingdepot-common.toml`) exposes
+  `transferCooldown` (ticks between cycles), `batchSize` (items moved per cycle), `maxNetworkSize`
+  (cap on Linker Nodes per Controller), and `validDestinationTag` (optional block tag — when set,
+  the Controller refuses to route into anything outside it, useful to keep items out of hoppers /
+  pipes in modpacks).
+- **Tutorial advancement chain.** The mod's advancements are now a step-by-step path that walks
+  new players through crafting a Filter Card → Linker → Linker Node → Depot Controller → wiring a
+  network → adding an Overflow Chest and a Depot Terminal.
+- **JEI ghost-slot drag.** With JEI installed you can drag any item from the recipe viewer directly
+  onto a Filter Card's ghost slots — no need to fetch a real stack first.
+- **French translation (`fr_fr.json`).**
+- **Long-form documentation.** New `README.md` and `docs/DOCS.md` cover quick-start, every block /
+  item, both config files, and a troubleshooting / FAQ section.
+
+### Fixed
+- **Double Overflow Chests now route into both halves.** Previously only the half holding the
+  block entity was exposed to the routing capability; joining a second chest doubled the visible
+  space in the GUI but not the addressable space. Both halves are now wired up everywhere
+  (routing fallback, capability, Terminal dashboard).
+
+### Notes
+- All 29 routing-engine unit tests still pass; no test changes this release.
+- The `linkerBeam.lineWidth` / `outlineWidth` per-version caveat from 1.1.0 still applies on
+  1.21.x builds.
+
 ## 1.1.0 — 2026-06-25
 
 ### Added
