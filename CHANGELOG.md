@@ -2,6 +2,42 @@
 
 All notable changes to Frosty's Sorting Depot are documented here.
 
+## 1.3.0 — 2026-06-29
+
+### Added
+- **Filter Card NOT / exclude mode.** A new toggle button at the top-right of the Filter Card
+  screen flips the card's decision: a card configured `NOT [cobblestone]` accepts everything
+  *except* cobblestone. Works in every mode (Item, Mod, Tag) and pairs naturally with a
+  higher-priority specific filter for the items you want elsewhere. Hover the button for an
+  in-game explanation. The card tooltip and the Depot Terminal both prefix `NOT` on negated rows.
+- **Two-hand Filter Card copy.** Hold a Filter Card in each hand and shift-right-click to copy
+  the main-hand card's configuration onto the off-hand card. Cuts the time to set up a network
+  of similar Linker Nodes way down. Over-hotbar confirmation, no chat spam.
+- **Depot Terminal: search box.** A 150-px text field at the top of the dashboard filters rows
+  by target block name OR filter text (case-insensitive substring). Typing "e" no longer closes
+  the GUI when the search box has focus.
+- **Depot Terminal: click-to-highlight.** Click a row to outline the corresponding Linker Node
+  in-world for 5 seconds, drawn through walls so you can spot it from anywhere — no more
+  hunting "which chest is this one again?" in a 200-node base. Uses the existing beam-render
+  path so the colour follows your Linker Beam config.
+- **Linker Node: Unlink button.** Open the node GUI; if it's registered to a Controller a red
+  Unlink button appears next to the status label. Clicking removes the node from the network
+  without breaking the block (so you keep the card inside).
+
+### Fixed
+- **Terminal click-to-highlight now x-rays on every branch.** Previously documented as a
+  per-version caveat on 1.21.x — the highlight was hidden by intervening blocks. Resolved on
+  1.21.5 / 1.21.8 via a NeoForge `PipelineModifier` that disables depth testing for the
+  highlight pass, and on 1.21.1 via a custom no-depth `RenderType`. Behaviour now matches 26.2
+  (which uses `Gizmos.setAlwaysOnTop`).
+
+### Notes
+- Routing-engine unit tests grew from 29 to 34 (added Negated/NOT coverage: inverted Item, Tag,
+  Mod, Overflow, and double-negation).
+- **Per-version caveat still applies:** `linkerBeam.lineWidth` / `outlineWidth` config values
+  only take effect on the 26.2 build. The 1.21.x line renderer uses a fixed pipeline width;
+  fixing it would mean a per-width RenderType cache for a cosmetic gain.
+
 ## 1.2.0 — 2026-06-28
 
 ### Added
