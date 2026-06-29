@@ -112,7 +112,11 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
                     Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.title").getVisualOrderText(),
                     Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line1").getVisualOrderText(),
                     Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line2").getVisualOrderText(),
-                    Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line3").getVisualOrderText()),
+                    Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line3").getVisualOrderText(),
+                    Component.empty().getVisualOrderText(),
+                    Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line4").getVisualOrderText(),
+                    Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line5").getVisualOrderText(),
+                    Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line6").getVisualOrderText()),
                     DefaultTooltipPositioner.INSTANCE, mouseX, mouseY, false);
         }
 
