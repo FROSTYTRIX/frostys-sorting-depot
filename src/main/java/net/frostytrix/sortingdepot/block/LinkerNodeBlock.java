@@ -55,6 +55,18 @@ public class LinkerNodeBlock extends Block implements EntityBlock {
     }
 
     @Override
+    protected boolean hasAnalogOutputSignal(BlockState state) {
+        return true;
+    }
+
+    @Override
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        return level.getBlockEntity(pos) instanceof LinkerNodeBlockEntity node
+                ? node.getComparatorSignal()
+                : 0;
+    }
+
+    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof LinkerNodeBlockEntity node) {
             player.openMenu(new SimpleMenuProvider(

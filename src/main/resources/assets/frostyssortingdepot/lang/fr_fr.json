@@ -38,6 +38,8 @@
   "gui.frostyssortingdepot.linker_node.linked": "Lié à un Contrôleur",
   "gui.frostyssortingdepot.linker_node.unlinked": "Non lié",
   "gui.frostyssortingdepot.linker_node.unlink": "Délier",
+  "gui.frostyssortingdepot.linker_node.name": "Nom",
+  "gui.frostyssortingdepot.linker_node.name.hint": "Nom personnalisé (affiché dans le Terminal)",
 
   "gui.frostyssortingdepot.controller.first_match": "Premier-correspondant",
   "gui.frostyssortingdepot.controller.round_robin": "Tour de rôle",
