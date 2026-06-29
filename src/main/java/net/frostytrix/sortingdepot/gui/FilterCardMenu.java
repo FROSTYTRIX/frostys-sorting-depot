@@ -37,6 +37,8 @@ public class FilterCardMenu extends AbstractContainerMenu {
     public static final int BTN_MODE_OVERFLOW = 3;
     /** Toggle strict (component-aware) matching for Item mode. */
     public static final int BTN_TOGGLE_STRICT = 4;
+    /** Toggle the NOT/exclude wrapper — inverts whichever mode the card is in. */
+    public static final int BTN_TOGGLE_NEGATED = 5;
     /** Remove the item at index {@code id - BTN_REMOVE_ITEM} (0..MAX_ITEMS-1). */
     public static final int BTN_REMOVE_ITEM = 100;
     /** Toggle the tag at index {@code id - BTN_TOGGLE_TAG} within {@link #displayedTags}. */
@@ -123,6 +125,8 @@ public class FilterCardMenu extends AbstractContainerMenu {
             updated = d.withMode(FilterCardData.Mode.OVERFLOW);
         } else if (id == BTN_TOGGLE_STRICT) {
             updated = d.withStrictToggled();
+        } else if (id == BTN_TOGGLE_NEGATED) {
+            updated = d.withNegatedToggled();
         } else if (id >= BTN_REMOVE_ITEM && id < BTN_REMOVE_ITEM + FilterCardData.MAX_ITEMS) {
             updated = d.withItemRemovedAt(id - BTN_REMOVE_ITEM);
         } else if (id >= BTN_ADD_SLOT) {

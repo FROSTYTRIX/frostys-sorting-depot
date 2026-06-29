@@ -75,6 +75,11 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
             return "(no card)";
         }
         FilterCardData data = FilterCardItem.data(card);
+        String prefix = data.negated() ? "NOT " : "";
+        return prefix + describeMode(data);
+    }
+
+    private static String describeMode(FilterCardData data) {
         return switch (data.mode()) {
             case ITEM -> {
                 String prefix = data.strict() ? "Items (NBT): " : "Items: ";
