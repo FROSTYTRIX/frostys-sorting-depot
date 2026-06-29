@@ -111,7 +111,11 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
                     Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.title"),
                     Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line1"),
                     Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line2"),
-                    Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line3")),
+                    Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line3"),
+                    Component.empty(),
+                    Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line4"),
+                    Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line5"),
+                    Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line6")),
                     mouseX, mouseY);
         }
 
