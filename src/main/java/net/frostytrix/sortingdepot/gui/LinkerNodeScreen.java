@@ -1,17 +1,24 @@
 package net.frostytrix.sortingdepot.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.frostytrix.sortingdepot.FrostysSortingDepot;
+import net.frostytrix.sortingdepot.blockentity.LinkerNodeBlockEntity;
+import net.frostytrix.sortingdepot.network.RenameLinkerNodePayload;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 /**
  * Screen for the Linker Node menu. Standard 176×166 container with a single Filter Card slot.
  * When the node is registered to a Controller, an <b>Unlink</b> button appears next to the status
- * label so the player can de-register the node without breaking the block.
+ * label so the player can de-register the node without breaking the block. A name field at the top
+ * lets the player give the node a custom label that shows in the Depot Terminal.
  *
  * <p>Client-only by reference: it is registered solely from the client-dist {@code RegisterMenuScreensEvent}
  * handler, so it never classloads on a dedicated server — no {@code @OnlyIn} needed.
@@ -30,8 +37,50 @@ public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
     private static final int BTN_HOVER = 0xFFA85A5A;
     private static final int TEXT_WHITE = 0xFFFFFFFF;
 
+    // Name field (relative to leftPos/topPos).
+    private static final int NAME_X = 8;
+    private static final int NAME_Y = 6;
+    private static final int NAME_W = 100;
+    private static final int NAME_H = 11;
+
+    private @org.jetbrains.annotations.Nullable EditBox nameBox;
+    /** The last value we transmitted; used to skip duplicate packets while the responder fires. */
+    private String lastSentName = "";
+
     public LinkerNodeScreen(LinkerNodeMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        String initial = this.menu.customName();
+        EditBox previous = this.nameBox;
+        this.nameBox = new EditBox(this.font, this.leftPos + NAME_X, this.topPos + NAME_Y,
+                NAME_W, NAME_H, Component.translatable("gui.frostyssortingdepot.linker_node.name"));
+        this.nameBox.setMaxLength(LinkerNodeBlockEntity.MAX_NAME_LENGTH);
+        this.nameBox.setBordered(true);
+        this.nameBox.setHint(Component.translatable("gui.frostyssortingdepot.linker_node.name.hint"));
+        this.nameBox.setValue(previous != null ? previous.getValue() : initial);
+        this.lastSentName = initial;
+        this.nameBox.setResponder(this::onNameChanged);
+        addRenderableWidget(this.nameBox);
+    }
+
+    private void onNameChanged(String value) {
+        if (value.equals(lastSentName)) {
+            return;
+        }
+        lastSentName = value;
+        // Optimistic local update so a reopen of this GUI in the same session shows the typed name
+        // (BlockEntity NBT doesn't sync server→client outside of chunk loads).
+        this.menu.getNode().setCustomName(value);
+        // PacketDistributor.sendToServer doesn't exist on 1.21.x either — send a ServerboundCustomPayloadPacket directly.
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null) {
+            mc.player.connection.getConnection().send(
+                    new ServerboundCustomPayloadPacket(new RenameLinkerNodePayload(this.menu.nodePos(), value)));
+        }
     }
 
     @Override
@@ -54,7 +103,7 @@ public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
 
     @Override
     protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
-        super.renderLabels(graphics, mouseX, mouseY);
+        // Skip the default title (the name field takes that horizontal slot).
         Component priority = Component.translatable(
                 "item.frostyssortingdepot.priority_stamp.value", this.menu.getNode().getPriority());
         graphics.drawString(this.font, priority, 8, 20, 0xFF404040, false);
@@ -76,5 +125,16 @@ public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        // While the name field has focus, swallow non-Escape keys so the inventory keybind ("E" by
+        // default) doesn't close the menu mid-rename.
+        if (this.nameBox != null && this.nameBox.isFocused() && keyCode != InputConstants.KEY_ESCAPE) {
+            this.nameBox.keyPressed(keyCode, scanCode, modifiers);
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }
