@@ -34,12 +34,15 @@ import net.minecraft.world.item.ItemStack;
  * </ul>
  * The item list and tags are retained across mode switches so the GUI can rebuild its pickers.
  *
- * @param mode   which matching strategy this card uses
- * @param items  reference item stacks (Item/Mod modes)
- * @param tags   tag keys (Tag mode)
- * @param strict whether Item mode also compares item components
+ * @param mode    which matching strategy this card uses
+ * @param items   reference item stacks (Item/Mod modes)
+ * @param tags    tag keys (Tag mode)
+ * @param strict  whether Item mode also compares item components
+ * @param negated when true, the card's decision is inverted: it accepts exactly the items the underlying
+ *                {@link #mode} would reject (the "NOT" / exclude wrapper). No effect on
+ *                {@link Mode#OVERFLOW} cards in practice — negated-overflow accepts nothing.
  */
-public record FilterCardData(Mode mode, List<ItemStack> items, Set<ResourceLocation> tags, boolean strict) {
+public record FilterCardData(Mode mode, List<ItemStack> items, Set<ResourceLocation> tags, boolean strict, boolean negated) {
 
     /** Maximum number of items a single card can list. */
     public static final int MAX_ITEMS = 5;
@@ -73,7 +76,7 @@ public record FilterCardData(Mode mode, List<ItemStack> items, Set<ResourceLocat
     }
 
     /** Freshly-crafted, unconfigured card: Item mode with no targets. */
-    public static final FilterCardData EMPTY = new FilterCardData(Mode.ITEM, List.of(), Set.of(), false);
+    public static final FilterCardData EMPTY = new FilterCardData(Mode.ITEM, List.of(), Set.of(), false, false);
 
     public static final Codec<FilterCardData> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             StringRepresentable.fromEnum(Mode::values).fieldOf("mode").forGetter(FilterCardData::mode),
@@ -81,7 +84,8 @@ public record FilterCardData(Mode mode, List<ItemStack> items, Set<ResourceLocat
             ResourceLocation.CODEC.listOf().optionalFieldOf("tags", List.of())
                     .xmap(list -> (Set<ResourceLocation>) new LinkedHashSet<>(list), List::copyOf)
                     .forGetter(FilterCardData::tags),
-            Codec.BOOL.optionalFieldOf("strict", false).forGetter(FilterCardData::strict)
+            Codec.BOOL.optionalFieldOf("strict", false).forGetter(FilterCardData::strict),
+            Codec.BOOL.optionalFieldOf("negated", false).forGetter(FilterCardData::negated)
     ).apply(inst, FilterCardData::new));
 
     /** Registry-aware (ItemStack components need registry access on the network). */
@@ -92,9 +96,9 @@ public record FilterCardData(Mode mode, List<ItemStack> items, Set<ResourceLocat
         return BuiltInRegistries.ITEM.getKey(stack.getItem());
     }
 
-    /** Convert to the pure routing representation. */
+    /** Convert to the pure routing representation. Wraps in {@link FilterMode.Negated} when {@link #negated}. */
     public FilterMode toFilterMode() {
-        return switch (mode) {
+        FilterMode base = switch (mode) {
             case ITEM -> strict
                     ? new FilterMode.ItemFilter(items.stream()
                             .map(s -> id(s) + " " + s.getComponentsPatch().toString()).collect(Collectors.toSet()), true)
@@ -105,16 +109,22 @@ public record FilterCardData(Mode mode, List<ItemStack> items, Set<ResourceLocat
             case TAG -> new FilterMode.TagFilter(tags.stream().map(ResourceLocation::toString).collect(Collectors.toSet()));
             case OVERFLOW -> new FilterMode.OverflowFilter();
         };
+        return negated ? new FilterMode.Negated(base) : base;
     }
 
     /** A copy with the mode replaced; the item/tag lists are kept so switching back loses nothing. */
     public FilterCardData withMode(Mode newMode) {
-        return newMode == mode ? this : new FilterCardData(newMode, items, tags, strict);
+        return newMode == mode ? this : new FilterCardData(newMode, items, tags, strict, negated);
     }
 
     /** Toggles strict (component-aware) item matching. */
     public FilterCardData withStrictToggled() {
-        return new FilterCardData(mode, items, tags, !strict);
+        return new FilterCardData(mode, items, tags, !strict, negated);
+    }
+
+    /** Toggles negation (the "NOT" / exclude wrapper). */
+    public FilterCardData withNegatedToggled() {
+        return new FilterCardData(mode, items, tags, strict, !negated);
     }
 
     /**
@@ -128,7 +138,7 @@ public record FilterCardData(Mode mode, List<ItemStack> items, Set<ResourceLocat
         }
         List<ItemStack> next = new ArrayList<>(items);
         next.add(stack.copyWithCount(1));
-        return new FilterCardData(mode, next, tags, strict);
+        return new FilterCardData(mode, next, tags, strict, negated);
     }
 
     /** Removes the item at {@code index}, or returns {@code this} if the index is out of range. */
@@ -138,7 +148,7 @@ public record FilterCardData(Mode mode, List<ItemStack> items, Set<ResourceLocat
         }
         List<ItemStack> next = new ArrayList<>(items);
         next.remove(index);
-        return new FilterCardData(mode, next, tags, strict);
+        return new FilterCardData(mode, next, tags, strict, negated);
     }
 
     /**
@@ -154,6 +164,6 @@ public record FilterCardData(Mode mode, List<ItemStack> items, Set<ResourceLocat
         } else {
             return this;
         }
-        return new FilterCardData(mode, items, next, strict);
+        return new FilterCardData(mode, items, next, strict, negated);
     }
 }

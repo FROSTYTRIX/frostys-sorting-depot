@@ -32,10 +32,29 @@ public class FilterCardItem extends Item {
         return stack.getOrDefault(SDDataComponents.FILTER_DATA.get(), FilterCardData.EMPTY);
     }
 
-    /** Right-click (in air) opens the configuration GUI for the held card. */
+    /**
+     * Right-click in air opens the configuration GUI for the held card. <b>Special case:</b> when the player
+     * sneaks while holding a Filter Card in <em>both</em> hands, right-click copies the main-hand card's
+     * configuration onto the off-hand card (handy for setting up many similar Linker Nodes without
+     * reconfiguring each card by hand).
+     */
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack held = player.getItemInHand(hand);
+        if (hand == InteractionHand.MAIN_HAND && player.isShiftKeyDown()) {
+            ItemStack main = player.getMainHandItem();
+            ItemStack off = player.getOffhandItem();
+            if (main.getItem() instanceof FilterCardItem && off.getItem() instanceof FilterCardItem) {
+                if (!level.isClientSide()) {
+                    off.set(SDDataComponents.FILTER_DATA.get(), data(main));
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        serverPlayer.sendSystemMessage(
+                                Component.translatable("item.frostyssortingdepot.filter_card.copied"), true);
+                    }
+                }
+                return InteractionResultHolder.sidedSuccess(held, level.isClientSide());
+            }
+        }
         if (player instanceof ServerPlayer serverPlayer) {
             serverPlayer.openMenu(
                     new SimpleMenuProvider((id, inv, p) -> new FilterCardMenu(id, inv, hand), held.getHoverName()),
@@ -47,9 +66,11 @@ public class FilterCardItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         FilterCardData d = data(stack);
-        tooltip.add(Component.translatable("item.frostyssortingdepot.filter_card.mode",
-                        Component.translatable("item.frostyssortingdepot.filter_card.mode." + d.mode().getSerializedName()))
-                .withStyle(ChatFormatting.GRAY));
+        Component modeName = Component.translatable("item.frostyssortingdepot.filter_card.mode." + d.mode().getSerializedName());
+        Component modeLine = d.negated()
+                ? Component.translatable("item.frostyssortingdepot.filter_card.mode_negated", modeName)
+                : Component.translatable("item.frostyssortingdepot.filter_card.mode", modeName);
+        tooltip.add(modeLine.copy().withStyle(ChatFormatting.GRAY));
 
         Component detail = switch (d.mode()) {
             case ITEM -> Component.translatable(d.strict()
