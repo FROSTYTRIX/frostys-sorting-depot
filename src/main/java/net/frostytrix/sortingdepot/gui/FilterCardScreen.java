@@ -7,6 +7,7 @@ import net.frostytrix.sortingdepot.item.FilterCardItem;
 import net.frostytrix.sortingdepot.item.component.FilterCardData;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -28,6 +29,13 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
     private static final int MODE_H = 16;
     private static final int[] MODE_X = {8, 50, 92, 134};
     private static final int MODE_W = 39;
+
+    // NOT/exclude toggle: a small button at the top-right of the panel, visible in every mode.
+    private static final int NOT_X = 138;
+    private static final int NOT_Y = 4;
+    private static final int NOT_W = 30;
+    private static final int NOT_H = 10;
+    private static final int NOT_ACTIVE = 0xFFA85A5A;
 
     public static final int GHOST_Y = 42;
     public static final int GHOST_X = 8;
@@ -93,6 +101,20 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
         drawButton(graphics, x + MODE_X[1], y + MODE_Y, btnLabel("mod"), mode == FilterCardData.Mode.MOD);
         drawButton(graphics, x + MODE_X[2], y + MODE_Y, btnLabel("tag"), mode == FilterCardData.Mode.TAG);
         drawButton(graphics, x + MODE_X[3], y + MODE_Y, btnLabel("any"), mode == FilterCardData.Mode.OVERFLOW);
+
+        // NOT/exclude toggle.
+        boolean negated = d.negated();
+        int notBg = negated ? NOT_ACTIVE : BTN;
+        graphics.fill(x + NOT_X, y + NOT_Y, x + NOT_X + NOT_W, y + NOT_Y + NOT_H, notBg);
+        graphics.drawCenteredString(font, btnLabel("not"), x + NOT_X + NOT_W / 2, y + NOT_Y + 1, TEXT_WHITE);
+        if (inRect(mouseX - x, mouseY - y, NOT_X, NOT_Y, NOT_W, NOT_H)) {
+            graphics.setTooltipForNextFrame(font, List.of(
+                    Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.title").getVisualOrderText(),
+                    Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line1").getVisualOrderText(),
+                    Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line2").getVisualOrderText(),
+                    Component.translatable("gui.frostyssortingdepot.filter_card.not.tooltip.line3").getVisualOrderText()),
+                    DefaultTooltipPositioner.INSTANCE, mouseX, mouseY, false);
+        }
 
         if (mode == FilterCardData.Mode.OVERFLOW) {
             graphics.drawCenteredString(font, Component.translatable("gui.frostyssortingdepot.filter_card.overflow"),
@@ -216,6 +238,11 @@ public class FilterCardScreen extends AbstractContainerScreen<FilterCardMenu> {
             }
             if (inRect(rx, ry, MODE_X[3], MODE_Y, MODE_W, MODE_H)) {
                 return click(FilterCardMenu.BTN_MODE_OVERFLOW);
+            }
+
+            // NOT/exclude toggle (top-right, visible in every mode).
+            if (inRect(rx, ry, NOT_X, NOT_Y, NOT_W, NOT_H)) {
+                return click(FilterCardMenu.BTN_TOGGLE_NEGATED);
             }
 
             if (mode != FilterCardData.Mode.OVERFLOW) {
