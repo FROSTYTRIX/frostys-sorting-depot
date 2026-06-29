@@ -26,5 +26,9 @@ public final class SDNetwork {
                 AddFilterItemPayload.TYPE,
                 AddFilterItemPayload.STREAM_CODEC,
                 AddFilterItemPayload::handle);
+        registrar.playToServer(
+                RenameLinkerNodePayload.TYPE,
+                RenameLinkerNodePayload.STREAM_CODEC,
+                RenameLinkerNodePayload::handle);
     }
 }

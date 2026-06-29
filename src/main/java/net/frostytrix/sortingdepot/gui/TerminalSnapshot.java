@@ -61,11 +61,12 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
 
     private static String targetName(Level level, LinkerNodeBlockEntity node) {
         if (node.getTargetHandler() == null) {
-            return "(no inventory)";
+            return node.displayName("(no inventory)");
         }
         Direction facing = node.getBlockState().getValue(LinkerNodeBlock.FACING);
         BlockPos targetPos = node.getBlockPos().relative(facing);
-        return level.getBlockState(targetPos).getBlock().getName().getString();
+        String blockName = level.getBlockState(targetPos).getBlock().getName().getString();
+        return node.displayName(blockName);
     }
 
     private static String describeFilter(ItemStack card) {
