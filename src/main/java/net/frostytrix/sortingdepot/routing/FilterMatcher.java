@@ -20,6 +20,7 @@ public final class FilterMatcher {
             case FilterMode.TagFilter f -> matchesTag(item, f);
             case FilterMode.ModFilter f -> f.namespaces().contains(item.namespace());
             case FilterMode.OverflowFilter ignored -> true;
+            case FilterMode.Negated n -> !matches(item, n.inner());
         };
     }
 

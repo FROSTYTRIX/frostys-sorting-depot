@@ -9,7 +9,8 @@ import java.util.Set;
  * adding a new variant becomes a compile error until the matcher handles it. Pure data, no Minecraft.
  */
 public sealed interface FilterMode
-        permits FilterMode.ItemFilter, FilterMode.TagFilter, FilterMode.ModFilter, FilterMode.OverflowFilter {
+        permits FilterMode.ItemFilter, FilterMode.TagFilter, FilterMode.ModFilter, FilterMode.OverflowFilter,
+                FilterMode.Negated {
 
     /**
      * Exact item match against a small set of keys.
@@ -59,4 +60,13 @@ public sealed interface FilterMode
 
     /** Wildcard: accepts anything. Used by Overflow-mode cards and the Overflow Chest. */
     record OverflowFilter() implements FilterMode {}
+
+    /**
+     * Inverts another filter: matches exactly the items the wrapped filter would <em>reject</em>. Lets a card
+     * say "everything except these items / mods / tags", which pairs naturally with an Overflow Chest for
+     * "send everything that isn't on the list there" routing.
+     *
+     * @param inner the filter whose decision should be flipped
+     */
+    record Negated(FilterMode inner) implements FilterMode {}
 }

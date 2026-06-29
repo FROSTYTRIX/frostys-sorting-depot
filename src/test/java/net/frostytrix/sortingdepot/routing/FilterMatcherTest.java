@@ -120,4 +120,51 @@ class FilterMatcherTest {
             assertTrue(FilterMatcher.matches(weird, new FilterMode.OverflowFilter()));
         }
     }
+
+    @Nested
+    @DisplayName("Negated")
+    class NegatedMode {
+
+        @Test
+        void invertsItemFilter() {
+            var filter = new FilterMode.Negated(FilterMode.ItemFilter.lenient("minecraft:oak_log"));
+            assertFalse(FilterMatcher.matches(oakLog(), filter));
+            assertTrue(FilterMatcher.matches(
+                    new RoutableItem("minecraft:stone", 1, Set.of(), null), filter));
+        }
+
+        @Test
+        void invertsTagFilter() {
+            var filter = new FilterMode.Negated(new FilterMode.TagFilter(Set.of("minecraft:logs")));
+            assertFalse(FilterMatcher.matches(oakLog(), filter));
+            assertTrue(FilterMatcher.matches(
+                    new RoutableItem("minecraft:stone", 1, Set.of(), null), filter));
+        }
+
+        @Test
+        void invertsModFilter() {
+            var filter = new FilterMode.Negated(new FilterMode.ModFilter(Set.of("create")));
+            var createGear = new RoutableItem("create:cogwheel", 1, Set.of(), null);
+            var vanillaStone = new RoutableItem("minecraft:stone", 1, Set.of(), null);
+            assertFalse(FilterMatcher.matches(createGear, filter));
+            assertTrue(FilterMatcher.matches(vanillaStone, filter));
+        }
+
+        @Test
+        void invertsOverflowToRejectEverything() {
+            var filter = new FilterMode.Negated(new FilterMode.OverflowFilter());
+            assertFalse(FilterMatcher.matches(oakLog(), filter));
+            assertFalse(FilterMatcher.matches(
+                    new RoutableItem("minecraft:stone", 1, Set.of(), null), filter));
+        }
+
+        @Test
+        void doubleNegationIsIdentity() {
+            var inner = FilterMode.ItemFilter.lenient("minecraft:oak_log");
+            var doubled = new FilterMode.Negated(new FilterMode.Negated(inner));
+            assertTrue(FilterMatcher.matches(oakLog(), doubled));
+            assertFalse(FilterMatcher.matches(
+                    new RoutableItem("minecraft:stone", 1, Set.of(), null), doubled));
+        }
+    }
 }
