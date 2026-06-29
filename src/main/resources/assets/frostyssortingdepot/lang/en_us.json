@@ -38,6 +38,8 @@
   "gui.frostyssortingdepot.linker_node.linked": "Linked to Controller",
   "gui.frostyssortingdepot.linker_node.unlinked": "Not linked",
   "gui.frostyssortingdepot.linker_node.unlink": "Unlink",
+  "gui.frostyssortingdepot.linker_node.name": "Name",
+  "gui.frostyssortingdepot.linker_node.name.hint": "Custom name (shown in Terminal)",
 
   "gui.frostyssortingdepot.controller.first_match": "First-match",
   "gui.frostyssortingdepot.controller.round_robin": "Round-robin",

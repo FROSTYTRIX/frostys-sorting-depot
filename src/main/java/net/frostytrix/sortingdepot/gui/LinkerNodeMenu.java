@@ -94,6 +94,16 @@ public class LinkerNodeMenu extends AbstractContainerMenu {
         return node;
     }
 
+    /** The Linker Node's {@link net.minecraft.core.BlockPos} — for client → server rename packets. */
+    public BlockPos nodePos() {
+        return node.getBlockPos();
+    }
+
+    /** Client-readable: the BE's current custom name (may be empty). Client resolves its node from the synced pos. */
+    public String customName() {
+        return node.getCustomName();
+    }
+
     /** Whether this node is registered to a Controller (synced to the client). */
     public boolean isLinked() {
         return linked;
