@@ -37,8 +37,8 @@ public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
 
     private static final int NAME_X = 8;
     private static final int NAME_Y = 6;
-    private static final int NAME_W = 100;
-    private static final int NAME_H = 11;
+    private static final int NAME_W = 160;
+    private static final int NAME_H = 12;
 
     private @org.jetbrains.annotations.Nullable EditBox nameBox;
     private String lastSentName = "";
