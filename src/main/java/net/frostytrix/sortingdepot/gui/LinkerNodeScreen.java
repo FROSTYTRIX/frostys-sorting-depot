@@ -39,11 +39,11 @@ public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
     private static final int BTN_HOVER = 0xFFA85A5A;
     private static final int TEXT_WHITE = 0xFFFFFFFF;
 
-    // Name field (relative to leftPos/topPos).
+    // Name field (relative to leftPos/topPos). Spans nearly the full panel width.
     private static final int NAME_X = 8;
     private static final int NAME_Y = 6;
-    private static final int NAME_W = 100;
-    private static final int NAME_H = 11;
+    private static final int NAME_W = 160;
+    private static final int NAME_H = 12;
 
     private @org.jetbrains.annotations.Nullable EditBox nameBox;
     /** The last value we transmitted; used to skip duplicate packets while the responder fires. */
