@@ -38,6 +38,13 @@ repositories {
             includeGroup("mezz.jei")
         }
     }
+    // EMI for the same ghost-slot drag (1.21.1 only — EMI has no build past this MC line).
+    maven {
+        url = "https://maven.terraformersmc.com/releases"
+        content {
+            includeGroup("dev.emi")
+        }
+    }
 }
 
 base {
@@ -151,6 +158,11 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+
+    // EMI — optional recipe-viewer integration (ghost-slot drag). API at compile time, full mod at
+    // localRuntime so we get it in runClient without forcing it downstream. 1.21.1 branch only.
+    compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
+    localRuntime "dev.emi:emi-neoforge:${emi_version}"
 
     // JUnit 5 for the pure-logic unit tests (routing package). These never touch Minecraft.
     testImplementation platform("org.junit:junit-bom:5.11.4")
