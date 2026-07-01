@@ -39,6 +39,16 @@ public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
     private static final int BTN_HOVER = 0xFFA85A5A;
     private static final int TEXT_WHITE = 0xFFFFFFFF;
 
+    // Enable/disable + insert-side buttons, stacked in the left column below the status line.
+    private static final int CTRL_X = 8;
+    private static final int ENABLE_Y = 44;
+    private static final int SIDE_Y = 62;
+    private static final int CTRL_W = 64;
+    private static final int CTRL_H = 14;
+    private static final int BTN_NEUTRAL = 0xFF6E6E6E;
+    private static final int BTN_ON = 0xFF4E7A4E;
+    private static final int BTN_OFF = 0xFF8A4A4A;
+
     // Name field (relative to leftPos/topPos). Spans nearly the full panel width.
     private static final int NAME_X = 8;
     private static final int NAME_Y = 6;
@@ -100,6 +110,30 @@ public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
             graphics.centeredText(this.font, Component.translatable("gui.frostyssortingdepot.linker_node.unlink"),
                     x + BTN_X + BTN_W / 2, y + BTN_Y + (BTN_H - 8) / 2, TEXT_WHITE);
         }
+
+        // Enable/disable toggle.
+        boolean enabled = this.menu.isEnabled();
+        drawButton(graphics, x + CTRL_X, y + ENABLE_Y, enabled ? BTN_ON : BTN_OFF,
+                Component.translatable(enabled
+                        ? "gui.frostyssortingdepot.linker_node.enabled"
+                        : "gui.frostyssortingdepot.linker_node.disabled"));
+
+        // Insert-side cycle.
+        drawButton(graphics, x + CTRL_X, y + SIDE_Y, BTN_NEUTRAL,
+                Component.translatable("gui.frostyssortingdepot.linker_node.side", insertSideLabel()));
+    }
+
+    private void drawButton(GuiGraphicsExtractor graphics, int bx, int by, int bg, Component label) {
+        graphics.fill(bx, by, bx + CTRL_W, by + CTRL_H, bg);
+        graphics.centeredText(this.font, label, bx + CTRL_W / 2, by + (CTRL_H - 8) / 2, TEXT_WHITE);
+    }
+
+    /** The current insert-side as a short label: "Auto" or the direction name. */
+    private Component insertSideLabel() {
+        net.minecraft.core.Direction side = this.menu.insertSide();
+        return side == null
+                ? Component.translatable("gui.frostyssortingdepot.linker_node.side.auto")
+                : Component.translatable("gui.frostyssortingdepot.linker_node.side." + side.getName());
     }
 
     @Override
@@ -117,15 +151,31 @@ public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == 0 && this.menu.isLinked()) {
+        if (event.button() == 0) {
             int rx = (int) event.x() - this.leftPos;
             int ry = (int) event.y() - this.topPos;
-            if (rx >= BTN_X && rx < BTN_X + BTN_W && ry >= BTN_Y && ry < BTN_Y + BTN_H) {
-                this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, LinkerNodeMenu.BTN_UNLINK);
+            if (this.menu.isLinked() && inRect(rx, ry, BTN_X, BTN_Y, BTN_W, BTN_H)) {
+                clickButton(LinkerNodeMenu.BTN_UNLINK);
+                return true;
+            }
+            if (inRect(rx, ry, CTRL_X, ENABLE_Y, CTRL_W, CTRL_H)) {
+                clickButton(LinkerNodeMenu.BTN_TOGGLE_ENABLED);
+                return true;
+            }
+            if (inRect(rx, ry, CTRL_X, SIDE_Y, CTRL_W, CTRL_H)) {
+                clickButton(LinkerNodeMenu.BTN_CYCLE_INSERT_SIDE);
                 return true;
             }
         }
         return super.mouseClicked(event, doubleClick);
+    }
+
+    private void clickButton(int id) {
+        this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, id);
+    }
+
+    private static boolean inRect(int px, int py, int rx, int ry, int w, int h) {
+        return px >= rx && px < rx + w && py >= ry && py < ry + h;
     }
 
     @Override
