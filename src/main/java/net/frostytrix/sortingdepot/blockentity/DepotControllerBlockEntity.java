@@ -181,6 +181,9 @@ public class DepotControllerBlockEntity extends BlockEntity {
                 if (!(level.getBlockEntity(linkerPos) instanceof LinkerNodeBlockEntity node)) {
                     continue;
                 }
+                if (!node.isEnabled()) {
+                    continue; // soft off-switch: keep the node registered but skip it while routing
+                }
                 FilterMode mode = node.getFilterMode();
                 if (mode == null) {
                     continue;

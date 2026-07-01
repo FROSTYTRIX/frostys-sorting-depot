@@ -49,6 +49,15 @@ public class LinkerNodeBlockEntity extends BlockEntity {
     private BlockPos controllerPos;
     /** Optional player-supplied name shown in the Depot Terminal; empty means "use the raw block name". */
     private String customName = "";
+    /** When false, routing skips this destination entirely (a soft off-switch that keeps the card/priority). */
+    private boolean enabled = true;
+    /**
+     * Which face of the target inventory items are inserted into. {@code null} = automatic (the face
+     * this node points at, i.e. {@code facing.getOpposite()}), matching vanilla hopper behaviour. A set
+     * value lets one node feed a specific side — e.g. the top of a furnace for smeltables vs the side for fuel.
+     */
+    @Nullable
+    private Direction insertSide;
 
     /** Hard cap on a node's custom name (in characters). Kept conservative for Terminal row width. */
     public static final int MAX_NAME_LENGTH = 32;
@@ -92,7 +101,9 @@ public class LinkerNodeBlockEntity extends BlockEntity {
         if (tag.isPresent() && !level.getBlockState(targetPos).is(tag.get())) {
             return null;
         }
-        return level.getCapability(Capabilities.ItemHandler.BLOCK, targetPos, facing.getOpposite());
+        // Insert from the node's facing side by default (hopper-like); an override picks a specific face.
+        Direction side = insertSide != null ? insertSide : facing.getOpposite();
+        return level.getCapability(Capabilities.ItemHandler.BLOCK, targetPos, side);
     }
 
     /**
@@ -162,6 +173,40 @@ public class LinkerNodeBlockEntity extends BlockEntity {
         return customName.isEmpty() ? fallback : customName;
     }
 
+    /** Whether routing may send items here. Disabled nodes keep their card + priority but are skipped. */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        if (this.enabled != enabled) {
+            this.enabled = enabled;
+            setChanged();
+        }
+    }
+
+    /** The insert-side override, or {@code null} for automatic (the node's facing side). */
+    public @Nullable Direction getInsertSide() {
+        return insertSide;
+    }
+
+    /** Client-side {@code DataSlot} sync setter: 0 = automatic, else {@code Direction.ordinal() + 1}. */
+    public void setInsertSideFromSync(int value) {
+        insertSide = value <= 0 ? null : Direction.values()[value - 1];
+    }
+
+    /** Cycles the insert side: automatic → DOWN → UP → NORTH → SOUTH → WEST → EAST → automatic. */
+    public void cycleInsertSide() {
+        if (insertSide == null) {
+            insertSide = Direction.values()[0];
+        } else if (insertSide.ordinal() + 1 >= Direction.values().length) {
+            insertSide = null;
+        } else {
+            insertSide = Direction.values()[insertSide.ordinal() + 1];
+        }
+        setChanged();
+    }
+
     /**
      * Drops the inserted Filter Card at {@code pos}. Called from the block's {@code onRemove} hook
      * because 1.21.1 has no {@code preRemoveSideEffects} on {@code BlockEntity}.
@@ -184,6 +229,12 @@ public class LinkerNodeBlockEntity extends BlockEntity {
         if (!customName.isEmpty()) {
             output.putString("custom_name", customName);
         }
+        if (!enabled) {
+            output.putBoolean("enabled", false);
+        }
+        if (insertSide != null) {
+            output.put("insert_side", Direction.CODEC.encodeStart(NbtOps.INSTANCE, insertSide).getOrThrow());
+        }
     }
 
     @Override
@@ -196,5 +247,10 @@ public class LinkerNodeBlockEntity extends BlockEntity {
                 ? null
                 : BlockPos.CODEC.parse(NbtOps.INSTANCE, controllerTag).result().orElse(null);
         customName = input.getString("custom_name");
+        enabled = !input.contains("enabled") || input.getBoolean("enabled");
+        Tag sideTag = input.get("insert_side");
+        insertSide = sideTag == null
+                ? null
+                : Direction.CODEC.parse(NbtOps.INSTANCE, sideTag).result().orElse(null);
     }
 }

@@ -35,6 +35,17 @@ public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
     private static final int BTN_HOVER = 0xFFA85A5A;
     private static final int TEXT_WHITE = 0xFFFFFFFF;
 
+    // Enable/disable + insert-side buttons, stacked in the left column below the status line.
+    private static final int CTRL_X = 8;
+    private static final int ENABLE_Y = 44;
+    private static final int SIDE_Y = 62;
+    private static final int CTRL_W = 64;
+    private static final int CTRL_H = 14;
+    private static final int BTN_NEUTRAL = 0xFF6E6E6E;
+    private static final int BTN_ON = 0xFF4E7A4E;
+    private static final int BTN_OFF = 0xFF8A4A4A;
+
+    // Name field (relative to leftPos/topPos). Spans nearly the full panel width.
     private static final int NAME_X = 8;
     private static final int NAME_Y = 6;
     private static final int NAME_W = 160;
@@ -84,9 +95,9 @@ public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
         graphics.blit(TEXTURE, this.leftPos, this.topPos, 0.0F, 0.0F,
                 this.imageWidth, this.imageHeight, 256, 256);
 
+        int x = this.leftPos;
+        int y = this.topPos;
         if (this.menu.isLinked()) {
-            int x = this.leftPos;
-            int y = this.topPos;
             boolean hovered = mouseX >= x + BTN_X && mouseX < x + BTN_X + BTN_W
                     && mouseY >= y + BTN_Y && mouseY < y + BTN_Y + BTN_H;
             graphics.fill(x + BTN_X, y + BTN_Y, x + BTN_X + BTN_W, y + BTN_Y + BTN_H,
@@ -95,6 +106,30 @@ public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
             int textX = x + BTN_X + (BTN_W - this.font.width(label)) / 2;
             graphics.drawString(this.font, label, textX, y + BTN_Y + (BTN_H - 8) / 2, TEXT_WHITE, false);
         }
+
+        // Enable/disable toggle.
+        boolean enabled = this.menu.isEnabled();
+        drawButton(graphics, x + CTRL_X, y + ENABLE_Y, enabled ? BTN_ON : BTN_OFF,
+                Component.translatable(enabled
+                        ? "gui.frostyssortingdepot.linker_node.enabled"
+                        : "gui.frostyssortingdepot.linker_node.disabled"));
+
+        // Insert-side cycle.
+        drawButton(graphics, x + CTRL_X, y + SIDE_Y, BTN_NEUTRAL,
+                Component.translatable("gui.frostyssortingdepot.linker_node.side", insertSideLabel()));
+    }
+
+    private void drawButton(GuiGraphics graphics, int bx, int by, int bg, Component label) {
+        graphics.fill(bx, by, bx + CTRL_W, by + CTRL_H, bg);
+        graphics.drawCenteredString(this.font, label, bx + CTRL_W / 2, by + (CTRL_H - 8) / 2, TEXT_WHITE);
+    }
+
+    /** The current insert-side as a short label: "Auto" or the direction name. */
+    private Component insertSideLabel() {
+        net.minecraft.core.Direction side = this.menu.insertSide();
+        return side == null
+                ? Component.translatable("gui.frostyssortingdepot.linker_node.side.auto")
+                : Component.translatable("gui.frostyssortingdepot.linker_node.side." + side.getName());
     }
 
     @Override
@@ -111,15 +146,31 @@ public class LinkerNodeScreen extends AbstractContainerScreen<LinkerNodeMenu> {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 0 && this.menu.isLinked()) {
+        if (button == 0) {
             int rx = (int) mouseX - this.leftPos;
             int ry = (int) mouseY - this.topPos;
-            if (rx >= BTN_X && rx < BTN_X + BTN_W && ry >= BTN_Y && ry < BTN_Y + BTN_H) {
-                this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, LinkerNodeMenu.BTN_UNLINK);
+            if (this.menu.isLinked() && inRect(rx, ry, BTN_X, BTN_Y, BTN_W, BTN_H)) {
+                clickButton(LinkerNodeMenu.BTN_UNLINK);
+                return true;
+            }
+            if (inRect(rx, ry, CTRL_X, ENABLE_Y, CTRL_W, CTRL_H)) {
+                clickButton(LinkerNodeMenu.BTN_TOGGLE_ENABLED);
+                return true;
+            }
+            if (inRect(rx, ry, CTRL_X, SIDE_Y, CTRL_W, CTRL_H)) {
+                clickButton(LinkerNodeMenu.BTN_CYCLE_INSERT_SIDE);
                 return true;
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    private void clickButton(int id) {
+        this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, id);
+    }
+
+    private static boolean inRect(int px, int py, int rx, int ry, int w, int h) {
+        return px >= rx && px < rx + w && py >= ry && py < ry + h;
     }
 
     @Override

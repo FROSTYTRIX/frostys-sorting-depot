@@ -33,11 +33,11 @@ import org.jetbrains.annotations.Nullable;
 public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int overflowFill, int inputCount) {
 
     /**
-     * One registered destination: the inventory it serves, its filter, how full it is (slot %), and the
-     * Linker Node's own {@link BlockPos} (used by the Terminal's click-to-highlight feature to point the
-     * player at the right node in-world).
+     * One registered destination: the inventory it serves, its filter, how full it is (slot %), the
+     * Linker Node's own {@link BlockPos} (used by the Terminal's click-to-highlight feature), its
+     * priority (1–5, for sorting), and whether it is currently enabled.
      */
-    public record Entry(BlockPos pos, String target, String filter, int fill) {
+    public record Entry(BlockPos pos, String target, String filter, int fill, int priority, boolean enabled) {
     }
 
     public static TerminalSnapshot empty() {
@@ -51,7 +51,7 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
         for (BlockPos pos : controller.getLinkers()) {
             if (level.getBlockEntity(pos) instanceof LinkerNodeBlockEntity node) {
                 entries.add(new Entry(pos, targetName(level, node), describeFilter(node.getFilterCard()),
-                        fillPercent(node.getTargetHandler())));
+                        fillPercent(node.getTargetHandler()), node.getPriority(), node.isEnabled()));
             }
         }
         IItemHandler overflow = adjacentOverflow(level, controller.getBlockPos());
@@ -131,6 +131,8 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
             buf.writeUtf(entry.target());
             buf.writeUtf(entry.filter());
             buf.writeVarInt(entry.fill());
+            buf.writeVarInt(entry.priority());
+            buf.writeBoolean(entry.enabled());
         }
         buf.writeBoolean(hasOverflow);
         buf.writeVarInt(overflowFill);
@@ -141,7 +143,8 @@ public record TerminalSnapshot(List<Entry> linkers, boolean hasOverflow, int ove
         int count = buf.readVarInt();
         List<Entry> entries = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
-            entries.add(new Entry(buf.readBlockPos(), buf.readUtf(), buf.readUtf(), buf.readVarInt()));
+            entries.add(new Entry(buf.readBlockPos(), buf.readUtf(), buf.readUtf(), buf.readVarInt(),
+                    buf.readVarInt(), buf.readBoolean()));
         }
         return new TerminalSnapshot(entries, buf.readBoolean(), buf.readVarInt(), buf.readVarInt());
     }
