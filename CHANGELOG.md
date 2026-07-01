@@ -2,6 +2,30 @@
 
 All notable changes to Frosty's Sorting Depot are documented here.
 
+## 1.4.0 — 2026-07-01
+
+### Added
+- **Linker Node comparator output.** A Linker Node now emits a vanilla-style redstone signal scaled
+  to how full its *target* inventory is (0 empty → 15 full). React to "this specific destination is
+  filling up" without watching the whole network through the Controller.
+- **Linker Node custom name.** A name field at the top of the node GUI lets you label a node; the
+  Depot Terminal shows the name in place of the raw block name — big networks become readable
+  ("North storage" instead of "barrel · barrel · barrel").
+- **Per-Linker enable/disable toggle.** A soft off-switch in the node GUI: routing skips a disabled
+  node but keeps its card and priority. Disabled rows are marked with ⊘ in the Terminal.
+- **Insert-side override.** A node feeds its target's facing side by default (hopper-like); a new
+  cycle button picks a specific face instead — e.g. the top of a furnace for smeltables vs the side
+  for fuel.
+- **Depot Terminal column sort.** A clickable header row (Name | Filter | Fill) like a file browser:
+  click a column to sort by it, click the active one again to flip ascending/descending (▲/▼).
+- **EMI integration (1.21.1 only).** Drag an item from EMI onto a Filter Card's ghost slots, mirroring
+  the JEI integration. EMI publishes no build past the 1.21.1 line, so this ships on that branch only;
+  the 26.2 / 1.21.5 / 1.21.8 builds keep the JEI integration alone.
+
+### Notes
+- All 34 routing-engine unit tests pass (NOT/negation coverage from 1.3.x retained; no new tests).
+- The `linkerBeam.lineWidth` / `outlineWidth` per-version caveat still applies on 1.21.x builds.
+
 ## 1.3.0 — 2026-06-29
 
 ### Added
