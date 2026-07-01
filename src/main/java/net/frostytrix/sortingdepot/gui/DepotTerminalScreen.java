@@ -32,11 +32,27 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
     private static final int ROW_HEIGHT = 10;
     private static final int SEARCH_WIDTH = 150;
     private static final int SEARCH_HEIGHT = 12;
-    private static final int LIST_TOP = 18 + SEARCH_HEIGHT + 2;
+    /** Y of the clickable column-header row; the entry list starts one row below it. */
+    private static final int HEADER_Y = 18 + SEARCH_HEIGHT + 2;
+    private static final int LIST_TOP = HEADER_Y + ROW_HEIGHT;
     private static final int ESC_KEY = 256;
     private static final int LIST_BOTTOM_MARGIN = 36; // reserved for the overflow + buffer lines
     private static final long HIGHLIGHT_DURATION_MS = 5_000L;
+    private static final int HEADER_COLOR = 0xFF202020;
 
+    /** Which column the rows are ordered by, chosen by clicking a header. */
+    private enum SortField {
+        NAME("name"), FILTER("filter"), FILL("fill");
+
+        final String key;
+
+        SortField(String key) {
+            this.key = key;
+        }
+    }
+
+    private SortField sortField = SortField.NAME;
+    private boolean ascending = true;
     private int scrollOffset; // index of the first entry shown
     private @org.jetbrains.annotations.Nullable EditBox searchBox;
 
@@ -80,24 +96,30 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
 
     /** The wrapped display lines for one entry: {@code target · filter · fill%}, wrapped to the row width. */
     private List<FormattedCharSequence> entryLines(TerminalSnapshot.Entry entry) {
-        String full = entry.target() + "  ·  " + entry.filter() + "  ·  " + entry.fill() + "%";
+        // Disabled destinations get a leading marker so they read as "skipped" at a glance.
+        String prefix = entry.enabled() ? "" : "⊘ ";
+        String full = prefix + entry.target() + "  ·  " + entry.filter() + "  ·  " + entry.fill() + "%";
         return this.font.split(Component.literal(full), rowWidth());
     }
 
-    /** Entries that pass the search filter (case-insensitive substring on target OR filter). */
+    /** Entries after the search filter (case-insensitive substring on target OR filter) and the active sort. */
     private List<TerminalSnapshot.Entry> visibleEntries() {
         List<TerminalSnapshot.Entry> all = this.menu.getSnapshot().linkers();
         String query = this.searchBox == null ? "" : this.searchBox.getValue().trim().toLowerCase(Locale.ROOT);
-        if (query.isEmpty()) {
-            return all;
-        }
         List<TerminalSnapshot.Entry> out = new ArrayList<>(all.size());
         for (TerminalSnapshot.Entry e : all) {
-            if (e.target().toLowerCase(Locale.ROOT).contains(query)
+            if (query.isEmpty()
+                    || e.target().toLowerCase(Locale.ROOT).contains(query)
                     || e.filter().toLowerCase(Locale.ROOT).contains(query)) {
                 out.add(e);
             }
         }
+        java.util.Comparator<TerminalSnapshot.Entry> cmp = switch (sortField) {
+            case NAME -> java.util.Comparator.comparing(TerminalSnapshot.Entry::target, String.CASE_INSENSITIVE_ORDER);
+            case FILTER -> java.util.Comparator.comparing(TerminalSnapshot.Entry::filter, String.CASE_INSENSITIVE_ORDER);
+            case FILL -> java.util.Comparator.comparingInt(TerminalSnapshot.Entry::fill);
+        };
+        out.sort(ascending ? cmp : cmp.reversed());
         return out;
     }
 
@@ -129,6 +151,22 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
         // empty-area clicks too (slot drag bookkeeping), which would swallow our row clicks.
         if (button == 0) {
             int guiX = (this.width - this.imageWidth) / 2;
+            int guiY = (this.height - this.imageHeight) / 2;
+            // Column headers: click to sort by that column; click the active one again to flip direction.
+            if (mouseY >= guiY + HEADER_Y && mouseY < guiY + HEADER_Y + ROW_HEIGHT
+                    && mouseX >= guiX + 8 && mouseX < guiX + 8 + rowWidth()) {
+                int third = rowWidth() / 3;
+                int rel = (int) mouseX - (guiX + 8);
+                SortField clicked = SortField.values()[Math.min(2, rel / third)];
+                if (clicked == sortField) {
+                    ascending = !ascending;
+                } else {
+                    sortField = clicked;
+                    ascending = true;
+                }
+                scrollOffset = 0;
+                return true;
+            }
             for (RowHit hit : rowHits) {
                 if (mouseY >= hit.top && mouseY < hit.bottom
                         && mouseX >= guiX + 8 && mouseX < guiX + 8 + rowWidth()) {
@@ -158,9 +196,29 @@ public class DepotTerminalScreen extends AbstractContainerScreen<DepotTerminalMe
                 this.imageWidth, this.imageHeight, 256, 256);
     }
 
+    /** The x offset (from panel left) where each of the three header columns begins. */
+    private int columnX(SortField field) {
+        int third = rowWidth() / 3;
+        return 8 + third * field.ordinal();
+    }
+
+    /** A column header label with a ▲/▼ arrow when it is the active sort column. */
+    private Component headerLabel(SortField field) {
+        Component base = Component.translatable("gui.frostyssortingdepot.terminal.col." + field.key);
+        if (field != sortField) {
+            return base;
+        }
+        return Component.literal(base.getString() + (ascending ? " ▲" : " ▼"));
+    }
+
     @Override
     protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
         graphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, TEXT_COLOR, false);
+
+        // Clickable column-header row (Name | Filter | Fill), one line above the entries.
+        for (SortField field : SortField.values()) {
+            graphics.drawString(this.font, headerLabel(field), columnX(field), HEADER_Y, HEADER_COLOR, false);
+        }
 
         rowHits.clear();
         int guiY = (this.height - this.imageHeight) / 2;
