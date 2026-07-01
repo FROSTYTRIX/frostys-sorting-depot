@@ -26,6 +26,10 @@ public class LinkerNodeMenu extends AbstractContainerMenu {
 
     /** Button id (via {@link #clickMenuButton}) that unlinks this node from its Controller. */
     public static final int BTN_UNLINK = 0;
+    /** Toggle whether routing may send items to this node. */
+    public static final int BTN_TOGGLE_ENABLED = 1;
+    /** Cycle the insert-side override (automatic → each of the six faces → automatic). */
+    public static final int BTN_CYCLE_INSERT_SIDE = 2;
 
     private final LinkerNodeBlockEntity node;
     private final ContainerLevelAccess access;
@@ -71,6 +75,32 @@ public class LinkerNodeMenu extends AbstractContainerMenu {
             }
         });
 
+        // Sync the enabled flag so the screen can colour the toggle button.
+        addDataSlot(new DataSlot() {
+            @Override
+            public int get() {
+                return node.isEnabled() ? 1 : 0;
+            }
+
+            @Override
+            public void set(int value) {
+                node.setEnabled(value != 0);
+            }
+        });
+
+        // Sync the insert side (0 = automatic, else Direction.ordinal() + 1).
+        addDataSlot(new DataSlot() {
+            @Override
+            public int get() {
+                return node.getInsertSide() == null ? 0 : node.getInsertSide().ordinal() + 1;
+            }
+
+            @Override
+            public void set(int value) {
+                node.setInsertSideFromSync(value);
+            }
+        });
+
         // Player inventory (3 rows) then hotbar.
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
@@ -109,6 +139,16 @@ public class LinkerNodeMenu extends AbstractContainerMenu {
         return linked;
     }
 
+    /** Whether routing may send items here (synced to the client for the toggle button). */
+    public boolean isEnabled() {
+        return node.isEnabled();
+    }
+
+    /** The insert-side override, or {@code null} for automatic (synced to the client via the node BE). */
+    public net.minecraft.core.Direction insertSide() {
+        return node.getInsertSide();
+    }
+
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (id == BTN_UNLINK) {
@@ -118,6 +158,14 @@ public class LinkerNodeMenu extends AbstractContainerMenu {
                 controller.removeLinker(node.getBlockPos());
             }
             node.setControllerPos(null);
+            return true;
+        }
+        if (id == BTN_TOGGLE_ENABLED) {
+            node.setEnabled(!node.isEnabled());
+            return true;
+        }
+        if (id == BTN_CYCLE_INSERT_SIDE) {
+            node.cycleInsertSide();
             return true;
         }
         return false;
